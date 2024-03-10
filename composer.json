@@ -1,0 +1,29 @@
+{
+  "name": "berkanumutlu/php-sitemap-generator",
+  "type": "project",
+  "description": "PHP Sitemap Generator by Berkan Ümütlü",
+  "keywords": [
+    "php",
+    "sitemap",
+    "sitemap-generator",
+    "php sitemap generator"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berkan Ümütlü",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://github.com/berkanumutlu/php-sitemap-generator",
+  "support": {
+    "issues": "https://github.com/berkanumutlu/php-sitemap-generator/issues",
+    "security": "https://github.com/berkanumutlu/php-sitemap-generator/security/policy"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/",
+      "App\\Library\\": "src/lib/"
+    }
+  }
+}
