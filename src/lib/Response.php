@@ -1,6 +1,6 @@
-<?php
+<?php namespace App\Library;
 
-namespace App\Library;
+use stdClass;
 
 class Response
 {
@@ -114,6 +114,9 @@ class Response
      */
     public function getDate()
     {
+        if (empty($this->date)) {
+            $this->setDate(date('Y-m-d H:i:s'));
+        }
         return $this->date;
     }
 
@@ -146,5 +149,20 @@ class Response
     public function toJson()
     {
         return json_encode($this->toArray());
+    }
+
+    /**
+     * @return stdClass
+     */
+    public function toObject()
+    {
+        $response = new stdClass();
+        $response->date = $this->getDate();
+        $response->status = $this->isStatus();
+        $response->code = $this->getStatusCode();
+        $response->status_text = $this->getStatusText();
+        $response->message = $this->getMessage();
+        $response->data = $this->getData();
+        return $response;
     }
 }

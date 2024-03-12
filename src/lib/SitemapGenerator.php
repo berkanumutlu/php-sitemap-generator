@@ -258,7 +258,7 @@ class SitemapGenerator
                 chmod($dir, 0777);
                 $this->response->setStatus(true);
             } else {
-                $this->response->setMessage('Directory cannot created.');
+                $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>');
             }
         }
         return $this->response;
@@ -274,18 +274,21 @@ class SitemapGenerator
     public function write($file_name, $file_path, $file_ext, $file_data)
     {
         $this->response->setStatus(false);
-        $create_file_path = $this->create_file_path(BASE_PATH.$file_path);
+        $create_file_path = $this->create_file_path($file_path);
+        $full_path = $file_path.$file_name.$file_ext;
         if ($create_file_path->isStatus()) {
-            $full_path = BASE_PATH.$file_path.$file_name.$file_ext;
+            $path_info = pathinfo($full_path);
+            $file_url = $_SERVER['HTTP_ORIGIN'].str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $path_info['dirname']).'/'.$path_info['basename'];
             file_put_contents($full_path, $file_data);
             if (file_exists($full_path)) {
                 $this->response->setStatus(true);
-                $this->response->setMessage('Sitemap file created. File path: '.$full_path);
+                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <a href="'.$file_url.'" target="_blank"><strong>'.$full_path.'</strong></a>');
             } else {
-                $this->response->setMessage('Sitemap file can not created.');
+                $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>');
             }
         } else {
-            $this->response->setMessage('Sitemap file path can not created. File path: '.BASE_PATH.$file_path);
+            $this->response->setMessage('Sitemap file path could not created.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <strong>'.$full_path.'</strong>');
         }
         return $this->response;
     }
