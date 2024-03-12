@@ -1,5 +1,12 @@
 <?php namespace App\Library;
 
+/**
+ * @category   class
+ * @package    SitemapGenerator
+ * @author     Berkan Ümütlü (github.com/berkanumutlu)
+ * @copyright  © 2023 Berkan Ümütlü
+ * @version    1.0.0
+ */
 class SitemapGenerator
 {
     /**
@@ -203,6 +210,9 @@ class SitemapGenerator
      */
     public function set_url_last_mod($url_last_mod)
     {
+        if (empty($url_last_mod)) {
+            $url_last_mod = $this->getLastMod();
+        }
         $this->url['lastmod'] = $url_last_mod;
     }
 
@@ -229,15 +239,21 @@ class SitemapGenerator
     public function set_urlset_body()
     {
         $url_list = $this->getUrllist();
-        $data = '<!--  created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)  -->';
+        $data = '<!--created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
         if (!empty($url_list)) {
             foreach ($this->url_list as $url) {
                 $item = (object) $url;
-                $data .= '<url>
-                            <loc>'.$item->loc.'</loc>
-                            <lastmod>'.$item->lastmod.'</lastmod>
-                            <priority>'.$item->priority.'</priority>
-                          </url>';
+                $data .= '<url>';
+                if (isset($item->loc)) {
+                    $data .= '<loc>'.$item->loc.'</loc>';
+                }
+                if (isset($item->lastmod)) {
+                    $data .= '<lastmod>'.$item->lastmod.'</lastmod>';
+                }
+                if (isset($item->priority)) {
+                    $data .= '<priority>'.$item->priority.'</priority>';
+                }
+                $data .= '</url>';
             }
         }
         $this->sitemap->setUrlsetBody($data);
@@ -278,8 +294,11 @@ class SitemapGenerator
         $full_path = $file_path.$file_name.$file_ext;
         if ($create_file_path->isStatus()) {
             $path_info = pathinfo($full_path);
-            $file_url = $_SERVER['HTTP_ORIGIN'].str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                    $path_info['dirname']).'/'.$path_info['basename'];
+            $httpProtocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+            $domain = $_SERVER['HTTP_HOST'];
+            $base_url = $httpProtocol.'://'.$domain;
+            $file_url = $base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $path_info['dirname']).'/'.$path_info['basename'].'?v='.$this->response->getDate();
             file_put_contents($full_path, $file_data);
             if (file_exists($full_path)) {
                 $this->response->setStatus(true);
@@ -288,7 +307,7 @@ class SitemapGenerator
                 $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>');
             }
         } else {
-            $this->response->setMessage('Sitemap file path could not created.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <strong>'.$full_path.'</strong>');
+            $this->response = $create_file_path;
         }
         return $this->response;
     }

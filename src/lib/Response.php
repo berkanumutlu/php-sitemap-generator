@@ -2,6 +2,13 @@
 
 use stdClass;
 
+/**
+ * @category   class
+ * @package    Response
+ * @author     Berkan Ümütlü (github.com/berkanumutlu)
+ * @copyright  © 2023 Berkan Ümütlü
+ * @version    1.0.0
+ */
 class Response
 {
     /**
