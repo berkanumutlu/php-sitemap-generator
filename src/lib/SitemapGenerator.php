@@ -7,6 +7,10 @@ class SitemapGenerator
      */
     private $sitemap;
     /**
+     * @var Response
+     */
+    private $response;
+    /**
      * @var array
      */
     private $url_list = array();
@@ -70,6 +74,7 @@ class SitemapGenerator
     public function __construct()
     {
         $this->sitemap = new Sitemap();
+        $this->response = new Response();
     }
 
     /**
@@ -93,8 +98,8 @@ class SitemapGenerator
      */
     public function add_url_to_list()
     {
-        $this->url_list[] = $this->url;
-        $this->url = array();
+        $this->url_list[] = $this->getUrl();
+        $this->setUrl(array());
     }
 
     /**
@@ -178,6 +183,9 @@ class SitemapGenerator
      */
     public function set_url_loc($url_loc)
     {
+        if (strpos($url_loc, $this->getSitemap()->getDomain()) == false) {
+            $url_loc .= $this->getSitemap()->getDomain().$url_loc;
+        }
         $this->url['loc'] = $url_loc;
     }
 
@@ -237,20 +245,23 @@ class SitemapGenerator
 
     /**
      * @param $path
-     * @return bool
+     * @return Response|true
      */
-    function create_file_path($path)
+    public function create_file_path($path)
     {
+        $this->response->setStatus(false);
         $dir = is_file($path) ? pathinfo($path, PATHINFO_DIRNAME) : $path;
         if (is_dir($dir)) {
-            return true;
+            $this->response->setStatus(true);
         } else {
             if (mkdir($dir)) {
                 chmod($dir, 0777);
-                return true;
+                $this->response->setStatus(true);
+            } else {
+                $this->response->setMessage('Directory cannot created.');
             }
         }
-        return false;
+        return $this->response;
     }
 
     /**
@@ -258,23 +269,29 @@ class SitemapGenerator
      * @param $file_path
      * @param $file_ext
      * @param $file_data
-     * @return bool
+     * @return Response
      */
     public function write($file_name, $file_path, $file_ext, $file_data)
     {
-        $status = false;
-        if ($this->create_file_path(BASE_PATH.$file_path)) {
+        $this->response->setStatus(false);
+        $create_file_path = $this->create_file_path(BASE_PATH.$file_path);
+        if ($create_file_path->isStatus()) {
             $full_path = BASE_PATH.$file_path.$file_name.$file_ext;
             file_put_contents($full_path, $file_data);
             if (file_exists($full_path)) {
-                $status = true;
+                $this->response->setStatus(true);
+                $this->response->setMessage('Sitemap file created. File path: '.$full_path);
+            } else {
+                $this->response->setMessage('Sitemap file can not created.');
             }
+        } else {
+            $this->response->setMessage('Sitemap file path can not created. File path: '.BASE_PATH.$file_path);
         }
-        return $status;
+        return $this->response;
     }
 
     /**
-     * @return bool
+     * @return Response
      */
     public function generate()
     {

@@ -25,5 +25,8 @@
       "App\\": "src/",
       "App\\Library\\": "src/lib/"
     }
+  },
+  "require": {
+    "ext-json": "*"
   }
 }
