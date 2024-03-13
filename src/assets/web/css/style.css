@@ -1,0 +1,61 @@
+:root {
+    --color-primary: #4F5B93;
+    --color-primary-hover: #6c7cc9;
+    --color-primary-active: #7889de;
+    --color-text-primary: #333;
+    --color-text-secondary: #efefef;
+    --color-bg-html: #056589;
+}
+
+html, body {
+    font-family: Gordita, Helvetica Neue, Helvetica, Arial, sans-serif;
+    background: var(--color-bg-html);
+}
+
+a {
+    color: var(--color-primary);
+}
+
+a:hover {
+    color: var(--color-primary-hover);
+}
+
+.btn-primary {
+    --bs-btn-color: var(--color-text-secondary);
+    --bs-btn-bg: var(--color-primary);
+    --bs-btn-border-color: var(--color-primary);
+    --bs-btn-hover-color: var(--color-text-secondary);
+    --bs-btn-hover-bg: var(--color-primary-hover);
+    --bs-btn-hover-border-color: var(--color-primary-hover);
+    --bs-btn-focus-shadow-rgb: 49, 132, 253;
+    --bs-btn-active-color: var(--color-text-secondary);
+    --bs-btn-active-bg: var(--color-primary-active);
+    --bs-btn-active-border-color: var(--color-primary-active);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--color-text-secondary);
+    --bs-btn-disabled-bg: var(--color-primary);
+    --bs-btn-disabled-border-color: var(--color-primary);
+}
+
+.alert-message,
+.alert-success-icon,
+.alert-danger-icon {
+    display: none;
+}
+
+.alert-message .alert-icon {
+    margin-right: 8px;
+}
+
+form .form-check-input:checked {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+}
+
+form .form-label {
+    font-weight: 600;
+}
+
+form .form-control:focus {
+    box-shadow: 0 0 0 0.25rem var(--color-primary-active);
+}
