@@ -18,6 +18,10 @@ class SitemapGenerator
      */
     private $response;
     /**
+     * @var string|null
+     */
+    private $base_url;
+    /**
      * @var array
      */
     private $url_list = array();
@@ -82,6 +86,7 @@ class SitemapGenerator
     {
         $this->sitemap = new Sitemap();
         $this->response = new Response();
+        $this->base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http").'://'.$_SERVER['HTTP_HOST'];
     }
 
     /**
@@ -191,7 +196,7 @@ class SitemapGenerator
     public function set_url_loc($url_loc)
     {
         if (strpos($url_loc, $this->getSitemap()->getDomain()) == false) {
-            $url_loc .= $this->getSitemap()->getDomain().$url_loc;
+            $url_loc = $this->getSitemap()->getDomain().'/'.$url_loc;
         }
         $this->url['loc'] = $url_loc;
     }
@@ -294,10 +299,7 @@ class SitemapGenerator
         $full_path = $file_path.$file_name.$file_ext;
         if ($create_file_path->isStatus()) {
             $path_info = pathinfo($full_path);
-            $httpProtocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-            $domain = $_SERVER['HTTP_HOST'];
-            $base_url = $httpProtocol.'://'.$domain;
-            $file_url = $base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+            $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
                     $path_info['dirname']).'/'.$path_info['basename'].'?v='.$this->response->getDate();
             file_put_contents($full_path, $file_data);
             if (file_exists($full_path)) {

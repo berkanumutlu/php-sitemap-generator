@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: mysql
--- Üretim Zamanı: 14 Mar 2024, 10:26:58
+-- Üretim Zamanı: 14 Mar 2024, 15:56:28
 -- Sunucu sürümü: 5.7.43
 -- PHP Sürümü: 8.2.12
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `tbl_page`
+-- Tablo için tablo yapısı `tbl_pages`
 --
 
-CREATE TABLE `tbl_page` (
+CREATE TABLE `tbl_pages` (
   `id` int(11) NOT NULL,
   `language_group_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
@@ -39,10 +39,10 @@ CREATE TABLE `tbl_page` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Tablo döküm verisi `tbl_page`
+-- Tablo döküm verisi `tbl_pages`
 --
 
-INSERT INTO `tbl_page` (`id`, `language_group_id`, `language_id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
+INSERT INTO `tbl_pages` (`id`, `language_group_id`, `language_id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, 'About Us', 'about-us', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '2024-03-08 13:10:58', NULL),
 (2, 1, 2, 'Über uns', 'uber-uns', 'Lorem Ipsum ist ein einfacher Demo-Text für die Print- und Schriftindustrie. Lorem Ipsum ist in der Industrie bereits der Standard Demo-Text seit 1500, als ein unbekannter Schriftsteller eine Hand voll Wörter nahm und diese durcheinander warf um ein Musterbuch zu erstellen. Es hat nicht nur 5 Jahrhunderte überlebt, sondern auch in Spruch in die elektronische Schriftbearbeitung geschafft (bemerke, nahezu unverändert). Bekannt wurde es 1960, mit dem erscheinen von \"Letraset\", welches Passagen von Lorem Ipsum enhielt, so wie Desktop Software wie \"Aldus PageMaker\" - ebenfalls mit Lorem Ipsum.', '2024-03-08 13:10:58', NULL),
 (3, 1, 3, 'À propos de nous', 'a-propos-de-nous', 'Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l\'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n\'a pas fait que survivre cinq siècles, mais s\'est aussi adapté à la bureautique informatique, sans que son contenu n\'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.', '2024-03-08 13:10:58', NULL),
@@ -105,9 +105,9 @@ INSERT INTO `tbl_products` (`id`, `language_group_id`, `language_id`, `name`, `s
 --
 
 --
--- Tablo için indeksler `tbl_page`
+-- Tablo için indeksler `tbl_pages`
 --
-ALTER TABLE `tbl_page`
+ALTER TABLE `tbl_pages`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -121,9 +121,9 @@ ALTER TABLE `tbl_products`
 --
 
 --
--- Tablo için AUTO_INCREMENT değeri `tbl_page`
+-- Tablo için AUTO_INCREMENT değeri `tbl_pages`
 --
-ALTER TABLE `tbl_page`
+ALTER TABLE `tbl_pages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
