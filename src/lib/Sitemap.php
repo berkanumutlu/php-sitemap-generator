@@ -23,7 +23,7 @@ class Sitemap
     /**
      * @var string
      */
-    private $file_path = __DIR__.'/sitemap/';
+    private $file_path = 'sitemap/';
     /**
      * @var string
      */
