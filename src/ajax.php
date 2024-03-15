@@ -40,13 +40,22 @@ if (!empty($_POST['sitemap'])) {
         if (!empty($_POST['file_urlset_footer'])) {
             $sitemap_generator->getSitemap()->setUrlsetFooter(trim($_POST['file_urlset_footer']));
         }
+        $sitemap_generator->set_url_loc('');
+        $sitemap_generator->set_url_last_mod(date('Y-m-d'));
+        $sitemap_generator->set_url_priority(1);
+        $sitemap_generator->add_url_to_list();
         $query_pages = $db->query("SELECT * from tbl_pages", PDO::FETCH_ASSOC);
         if ($query_pages && $query_pages->rowCount()) {
             $pages = $query_pages->fetchAll(PDO::FETCH_ASSOC);
             foreach ($pages as $page) {
                 $sitemap_generator->set_url_loc($page['slug']);
-                $sitemap_generator->set_url_last_mod(!empty($page['updated_at']) ? $page['updated_at'] : $page['created_at']);
+                $date = !empty($page['updated_at']) ? $page['updated_at'] : $page['created_at'];
+                $sitemap_generator->set_url_last_mod(date('Y-m-d', strtotime($date)));
                 $sitemap_generator->set_url_priority(0.8);
+                if (!empty($page['image'])) {
+                    $sitemap_generator->set_url_image_loc('assets/images/pages/'.$page['image']);
+                    $sitemap_generator->set_url_image_title($page['name']);
+                }
                 $sitemap_generator->add_url_to_list();
             }
         }
@@ -55,8 +64,13 @@ if (!empty($_POST['sitemap'])) {
             $products = $query_products->fetchAll(PDO::FETCH_ASSOC);
             foreach ($products as $product) {
                 $sitemap_generator->set_url_loc('product-detail/'.$product['slug']);
-                $sitemap_generator->set_url_last_mod(!empty($product['updated_at']) ? $product['updated_at'] : $product['created_at']);
+                $date = !empty($product['updated_at']) ? $product['updated_at'] : $product['created_at'];
+                $sitemap_generator->set_url_last_mod(date('Y-m-d', strtotime($date)));
                 $sitemap_generator->set_url_priority(1);
+                if (!empty($product['image'])) {
+                    $sitemap_generator->set_url_image_loc('assets/images/products/'.$product['image']);
+                    $sitemap_generator->set_url_image_title($product['name']);
+                }
                 $sitemap_generator->add_url_to_list();
             }
         }

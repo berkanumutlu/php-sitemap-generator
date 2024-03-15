@@ -81,6 +81,14 @@ class SitemapGenerator
      * @var float
      */
     private $priority = 0.5;
+    /**
+     * [
+     *  'loc'   => 'image_url',
+     *  'title' => 'Image Title'
+     * ]
+     * @var array
+     */
+    private $url_image = array();
 
     public function __construct()
     {
@@ -119,6 +127,9 @@ class SitemapGenerator
      */
     public function getUrl()
     {
+        if ($this->getUrlImage()) {
+            $this->url['image'] = $this->getUrlImage();
+        }
         return $this->url;
     }
 
@@ -182,6 +193,22 @@ class SitemapGenerator
     }
 
     /**
+     * @return array
+     */
+    public function getUrlImage()
+    {
+        return $this->url_image;
+    }
+
+    /**
+     * @param  array  $url_image
+     */
+    public function setUrlImage($url_image)
+    {
+        $this->url_image = $url_image;
+    }
+
+    /**
      * @return mixed|string
      */
     public function get_url_loc()
@@ -239,6 +266,27 @@ class SitemapGenerator
     }
 
     /**
+     * @param $url_image_loc
+     * @return void
+     */
+    public function set_url_image_loc($url_image_loc)
+    {
+        if (strpos($url_image_loc, $this->getSitemap()->getDomain()) == false) {
+            $url_image_loc = $this->getSitemap()->getDomain().'/'.$url_image_loc;
+        }
+        $this->url_image['loc'] = $url_image_loc;
+    }
+
+    /**
+     * @param $url_image_title
+     * @return void
+     */
+    public function set_url_image_title($url_image_title)
+    {
+        $this->url_image['title'] = $url_image_title;
+    }
+
+    /**
      * @return void
      */
     public function set_urlset_body()
@@ -257,6 +305,16 @@ class SitemapGenerator
                 }
                 if (isset($item->priority)) {
                     $data .= '<priority>'.$item->priority.'</priority>';
+                }
+                if (isset($item->image)) {
+                    $data .= '<image:image>';
+                    if (isset($item->image['loc'])) {
+                        $data .= '<image:loc>'.$item->image['loc'].'</image:loc>';
+                    }
+                    if (isset($item->image['title'])) {
+                        $data .= '<image:title>'.$item->image['title'].'</image:title>';
+                    }
+                    $data .= '</image:image>';
                 }
                 $data .= '</url>';
             }
