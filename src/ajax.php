@@ -48,12 +48,12 @@ if (!empty($_POST['sitemap'])) {
         if ($query_pages && $query_pages->rowCount()) {
             $pages = $query_pages->fetchAll(PDO::FETCH_ASSOC);
             foreach ($pages as $page) {
-                $sitemap_generator->set_url_loc($page['slug']);
+                $sitemap_generator->set_url_loc(urlencode($page['slug']));
                 $date = !empty($page['updated_at']) ? $page['updated_at'] : $page['created_at'];
                 $sitemap_generator->set_url_last_mod(date('Y-m-d', strtotime($date)));
                 $sitemap_generator->set_url_priority(0.8);
                 if (!empty($page['image'])) {
-                    $sitemap_generator->set_url_image_loc('assets/images/pages/'.$page['image']);
+                    $sitemap_generator->set_url_image_loc('assets/images/pages/'.urlencode($page['image']));
                     $sitemap_generator->set_url_image_title($page['name']);
                 }
                 $sitemap_generator->add_url_to_list();
@@ -63,12 +63,12 @@ if (!empty($_POST['sitemap'])) {
         if ($query_products && $query_products->rowCount()) {
             $products = $query_products->fetchAll(PDO::FETCH_ASSOC);
             foreach ($products as $product) {
-                $sitemap_generator->set_url_loc('product-detail/'.$product['slug']);
+                $sitemap_generator->set_url_loc('product-detail/'.urlencode($product['slug']));
                 $date = !empty($product['updated_at']) ? $product['updated_at'] : $product['created_at'];
                 $sitemap_generator->set_url_last_mod(date('Y-m-d', strtotime($date)));
                 $sitemap_generator->set_url_priority(1);
                 if (!empty($product['image'])) {
-                    $sitemap_generator->set_url_image_loc('assets/images/products/'.$product['image']);
+                    $sitemap_generator->set_url_image_loc('assets/images/products/'.urlencode($product['image']));
                     $sitemap_generator->set_url_image_title($product['name']);
                 }
                 $sitemap_generator->add_url_to_list();
