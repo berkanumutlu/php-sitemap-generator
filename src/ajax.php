@@ -26,7 +26,14 @@ if (!empty($_POST['sitemap'])) {
             $sitemap_generator->getSitemap()->setFilePath(BASE_PATH.trim($_POST['file_path']));
         }
         if (!empty($_POST['file_name'])) {
-            $sitemap_generator->getSitemap()->setFileName(trim($_POST['file_name']));
+            $file_name = trim($_POST['file_name']);
+            if (!empty($_POST['file_name_unique'])) {
+                $file_name .= '-'.uniqid();
+            }
+            if (!empty($_POST['file_name_date'])) {
+                $file_name .= '-'.date('Y-m-d');
+            }
+            $sitemap_generator->getSitemap()->setFileName($file_name);
         }
         if (!empty($_POST['file_ext'])) {
             $sitemap_generator->getSitemap()->setFileExt(trim($_POST['file_ext']));
