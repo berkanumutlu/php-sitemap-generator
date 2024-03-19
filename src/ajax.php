@@ -9,6 +9,9 @@ if (!empty($_POST['sitemap'])) {
     $response = new \App\Library\Response();
     $sitemap_generator = new SitemapGenerator();
     try {
+        /*
+         * Setting form options
+         */
         $sitemap_generator->getSitemap()->setHttpSecure(!empty($_POST['http_secure']));
         if (!empty($_POST['domain'])) {
             $sitemap_generator->getSitemap()->setDomain(trim($_POST['domain']));
@@ -47,10 +50,16 @@ if (!empty($_POST['sitemap'])) {
         if (!empty($_POST['file_urlset_footer'])) {
             $sitemap_generator->getSitemap()->setUrlsetFooter(trim($_POST['file_urlset_footer']));
         }
+        /*
+         * Adding base url
+         */
         $sitemap_generator->set_url_loc('');
         $sitemap_generator->set_url_last_mod(date('Y-m-d'));
         $sitemap_generator->set_url_priority(1);
         $sitemap_generator->add_url_to_list();
+        /*
+         * Adding page urls
+         */
         $query_pages = $db->query("SELECT * from tbl_pages", PDO::FETCH_ASSOC);
         if ($query_pages && $query_pages->rowCount()) {
             $pages = $query_pages->fetchAll(PDO::FETCH_ASSOC);
@@ -66,6 +75,9 @@ if (!empty($_POST['sitemap'])) {
                 $sitemap_generator->add_url_to_list();
             }
         }
+        /*
+         * Adding products urls
+         */
         $query_products = $db->query("SELECT * from tbl_products", PDO::FETCH_ASSOC);
         if ($query_products && $query_products->rowCount()) {
             $products = $query_products->fetchAll(PDO::FETCH_ASSOC);
@@ -81,6 +93,9 @@ if (!empty($_POST['sitemap'])) {
                 $sitemap_generator->add_url_to_list();
             }
         }
+        /*
+         * Generating sitemap
+         */
         $response = $sitemap_generator->generate();
     } catch (\Exception $e) {
         $response->setStatus(false);

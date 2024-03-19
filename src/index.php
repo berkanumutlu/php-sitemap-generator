@@ -105,12 +105,14 @@ $sitemap_generator = new SitemapGenerator();
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="file_name_unique"
                                                id="file_name_unique" role="switch">
-                                        <label class="form-check-label" for="file_name_unique">Unique file name</label>
+                                        <label class="form-check-label" for="file_name_unique">Unique file name<br>(e.g.
+                                            sitemap-65f6bc7e98127.xml)</label>
                                     </div>
                                     <div class="form-check form-switch ms-3">
                                         <input class="form-check-input" type="checkbox" name="file_name_date"
                                                id="file_name_date" role="switch">
-                                        <label class="form-check-label" for="file_name_date">File name with date</label>
+                                        <label class="form-check-label" for="file_name_date">File name with date<br>(e.g.
+                                            sitemap-2023-03-17.xml)</label>
                                     </div>
                                 </div>
                             </div>

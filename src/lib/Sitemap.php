@@ -104,6 +104,9 @@ class Sitemap
      */
     public function setFilePath($file_path)
     {
+        if (mb_substr($file_path, -1) !== '/') {
+            $file_path .= '/';
+        }
         $this->file_path = $file_path;
     }
 
