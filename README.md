@@ -13,12 +13,83 @@
 
 # PHP Sitemap Generator
 
-This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, a change frequency and a priority.
+This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, change frequency, priority and image properties.
+
+Sitemap format: http://www.sitemaps.org/protocol.html
+
+## Sitemap file
+
+After creating your sitemap.xml file, you should add the XML file to your `robots.txt`.
+
+Line for the robots.txt:
+
+```
+Sitemap: http://example.com/sitemap/sitemap.xml
+```
+
+## Output
+
+Example output when generating a sitemap
+
+```XML
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+    <!-- created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator) -->
+    <url>
+        <loc>http://example.com/</loc>
+        <lastmod>2024-03-17</lastmod>
+        <priority>1</priority>
+    </url>
+    <url>
+        <loc>http://example.com/about-us</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>http://example.com/assets/images/pages/about-us.jpg</image:loc>
+        </image:image>
+    </url>
+    <url>
+        <loc>http://example.com/uber-uns</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/a-propos-de-nous</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/sobre-nosotros</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/o-nas</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/%D9%85%D8%B9%D9%84%D9%88%D9%85%D8%A7%D8%AA-%D8%B9%D9%86%D8%A7</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/chi-siamo</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://example.com/hakkimizda</loc>
+        <lastmod>2024-03-08</lastmod>
+        <priority>0.8</priority>
+    </url>
+</urlset>
+```
 
 ## Screenshots
 
 ![screenshot01](screenshots/screenshot01.png)
-![screenshot01](screenshots/screenshot02.png)
+![screenshot02](screenshots/screenshot02.png)
 
 ## License
 
