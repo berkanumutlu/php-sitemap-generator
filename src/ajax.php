@@ -50,6 +50,9 @@ if (!empty($_POST['sitemap'])) {
         if (!empty($_POST['file_urlset_footer'])) {
             $sitemap_generator->getSitemap()->setUrlsetFooter(trim($_POST['file_urlset_footer']));
         }
+        if (!empty($_POST['url_limit'])) {
+            $sitemap_generator->setUrlLimit(trim($_POST['url_limit']));
+        }
         /*
          * Adding base url
          */

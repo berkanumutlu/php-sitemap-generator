@@ -117,6 +117,14 @@ $sitemap_generator = new SitemapGenerator();
                                 </div>
                             </div>
                             <div class="col-12">
+                                <div class="input-group align-items-center mb-3">
+                                    <label for="url_limit" class="form-label mb-0 me-2">URL Limit</label>
+                                    <input type="number" id="url_limit" name="url_limit" class="form-control"
+                                           min="0" max="50000" step="1" onkeyup="checkInputNumberValue(this)"
+                                           value="<?= $sitemap_generator->getUrlLimit() ?>">
+                                </div>
+                            </div>
+                            <div class="col-12">
                                 <div class="mb-3">
                                     <label for="file_header" class="form-label">File Header</label>
                                     <textarea name="file_header" id="file_header" class="form-control"

@@ -438,25 +438,34 @@ class SitemapGenerator
         $file_ext = $this->sitemap->getFileExt();
         $url_list = $this->getUrllist();
         $url_limit = $this->getUrlLimit();
-        $url_list_chunk = array_chunk($url_list, $url_limit);
         /*
-         * If there is more than 1 file, a sitemap index will be created
+         * If url limit is not 0 (zero)
          */
-        if (count($url_list_chunk) > 1) {
-            $file_index_path = $file_path.'index/';
-            $i = 1;
-            foreach ($url_list_chunk as $list) {
-                $this->set_urlset_body($list);
-                $file_index_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
-                $file_index_name = $file_name.'-'.$i;
-                $this->response = $this->write($file_index_name, $file_index_path, $file_ext, $file_index_data);
-                if (!$this->response->isStatus()) {
-                    break;
+        if (!empty($url_limit)) {
+            $url_list_chunk = array_chunk($url_list, $url_limit);
+            /*
+             * If there is more than 1 file, a sitemap index will be created
+             */
+            if (count($url_list_chunk) > 1) {
+                $file_index_path = $file_path.'index/';
+                $i = 1;
+                foreach ($url_list_chunk as $list) {
+                    $this->set_urlset_body($list);
+                    $file_index_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+                    $file_index_name = $file_name.'-'.$i;
+                    $this->response = $this->write($file_index_name, $file_index_path, $file_ext, $file_index_data);
+                    if (!$this->response->isStatus()) {
+                        break;
+                    }
+                    $i++;
                 }
-                $i++;
-            }
-            if ($this->response->isStatus()) {
-                $this->response = $this->create_sitemap_index($file_path, $file_name, $file_ext, $file_index_path);
+                if ($this->response->isStatus()) {
+                    $this->response = $this->create_sitemap_index($file_path, $file_name, $file_ext, $file_index_path);
+                }
+            } else {
+                $this->set_urlset_body();
+                $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+                $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
             }
         } else {
             $this->set_urlset_body();
