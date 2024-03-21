@@ -35,6 +35,18 @@ class SitemapGenerator
      */
     private $url = array();
     /**
+     * [
+     *  'loc'   => 'image_url',
+     *  'title' => 'Image Title'
+     * ]
+     * @var array
+     */
+    private $url_image = array();
+    /**
+     * @var int
+     */
+    private $url_limit = 50000;
+    /**
      * The date of last modification of the page. This date should be in W3C Datetime format.
      * This format allows you to omit the time portion, if desired, and use YYYY-MM-DD.
      *
@@ -119,6 +131,9 @@ class SitemapGenerator
      */
     public function getUrl()
     {
+        if ($this->getUrlImage()) {
+            $this->url['image'] = $this->getUrlImage();
+        }
         return $this->url;
     }
 
@@ -128,6 +143,38 @@ class SitemapGenerator
     public function setUrl($url)
     {
         $this->url = $url;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUrlImage()
+    {
+        return $this->url_image;
+    }
+
+    /**
+     * @param  array  $url_image
+     */
+    public function setUrlImage($url_image)
+    {
+        $this->url_image = $url_image;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUrlLimit()
+    {
+        return $this->url_limit;
+    }
+
+    /**
+     * @param  int  $url_limit
+     */
+    public function setUrlLimit($url_limit)
+    {
+        $this->url_limit = $url_limit;
     }
 
     /**
@@ -239,14 +286,38 @@ class SitemapGenerator
     }
 
     /**
+     * @param $url_image_loc
      * @return void
      */
-    public function set_urlset_body()
+    public function set_url_image_loc($url_image_loc)
     {
-        $url_list = $this->getUrllist();
+        if (strpos($url_image_loc, $this->getSitemap()->getDomain()) == false) {
+            $url_image_loc = $this->getSitemap()->getDomain().'/'.$url_image_loc;
+        }
+        $this->url_image['loc'] = $url_image_loc;
+    }
+
+    /**
+     * @param $url_image_title
+     * @return void
+     */
+    public function set_url_image_title($url_image_title)
+    {
+        $this->url_image['title'] = $url_image_title;
+    }
+
+    /**
+     * @param $url_list
+     * @return void
+     */
+    public function set_urlset_body($url_list = array())
+    {
+        if (empty($url_list)) {
+            $url_list = $this->getUrllist();
+        }
         $data = '<!--created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
         if (!empty($url_list)) {
-            foreach ($this->url_list as $url) {
+            foreach ($url_list as $url) {
                 $item = (object) $url;
                 $data .= '<url>';
                 if (isset($item->loc)) {
@@ -258,6 +329,16 @@ class SitemapGenerator
                 if (isset($item->priority)) {
                     $data .= '<priority>'.$item->priority.'</priority>';
                 }
+                if (isset($item->image)) {
+                    $data .= '<image:image>';
+                    if (isset($item->image['loc'])) {
+                        $data .= '<image:loc>'.$item->image['loc'].'</image:loc>';
+                    }
+                    if (isset($item->image['title'])) {
+                        $data .= '<image:title>'.$item->image['title'].'</image:title>';
+                    }
+                    $data .= '</image:image>';
+                }
                 $data .= '</url>';
             }
         }
@@ -266,7 +347,7 @@ class SitemapGenerator
 
     /**
      * @param $path
-     * @return Response|true
+     * @return Response
      */
     public function create_file_path($path)
     {
@@ -281,6 +362,39 @@ class SitemapGenerator
             } else {
                 $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>');
             }
+        }
+        return $this->response;
+    }
+
+    /**
+     * @param $file_path
+     * @param $file_name
+     * @param $file_ext
+     * @param $index_dir
+     * @return Response
+     */
+    public function create_sitemap_index($file_path, $file_name, $file_ext, $index_dir)
+    {
+        $sitemap_list = scandir($index_dir);
+        if (!empty($sitemap_list) && count($sitemap_list) > 2) {
+            $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            $sitemap_index_footer = '</sitemapindex>';
+            $sitemap_index_content = '';
+            foreach ($sitemap_list as $sitemap) {
+                if ($sitemap === '.' || $sitemap === '..') {
+                    continue;
+                }
+                $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '', $index_dir).$sitemap;
+                $sitemap_index_content .= '<sitemap>
+                    <loc>'.$file_url.'</loc>
+                    <lastmod>'.date('Y-m-d', filectime($index_dir.$sitemap)).'</lastmod>
+                </sitemap>';
+            }
+            $file_data = $sitemap_index_header.$sitemap_index_content.$sitemap_index_footer;
+            $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
+        } else {
+            $this->response->setStatus(false);
+            $this->response->setMessage('Sitemap index files not found.<br>Date: <strong>'.$this->response->getDate().'</strong>,  Sitemap index dir: <strong>'.$index_dir.'</strong>');
         }
         return $this->response;
     }
@@ -306,7 +420,7 @@ class SitemapGenerator
                 $this->response->setStatus(true);
                 $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <a href="'.$file_url.'" target="_blank"><strong>'.$full_path.'</strong></a>');
             } else {
-                $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>');
+                $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <strong>'.$full_path.'</strong>');
             }
         } else {
             $this->response = $create_file_path;
@@ -322,8 +436,42 @@ class SitemapGenerator
         $file_path = $this->sitemap->getFilePath();
         $file_name = $this->sitemap->getFileName();
         $file_ext = $this->sitemap->getFileExt();
-        $this->set_urlset_body();
-        $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
-        return $this->write($file_name, $file_path, $file_ext, $file_data);
+        $url_list = $this->getUrllist();
+        $url_limit = $this->getUrlLimit();
+        /*
+         * If url limit is not 0 (zero)
+         */
+        if (!empty($url_limit)) {
+            $url_list_chunk = array_chunk($url_list, $url_limit);
+            /*
+             * If there is more than 1 file, a sitemap index will be created
+             */
+            if (count($url_list_chunk) > 1) {
+                $file_index_path = $file_path.'index/';
+                $i = 1;
+                foreach ($url_list_chunk as $list) {
+                    $this->set_urlset_body($list);
+                    $file_index_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+                    $file_index_name = $file_name.'-'.$i;
+                    $this->response = $this->write($file_index_name, $file_index_path, $file_ext, $file_index_data);
+                    if (!$this->response->isStatus()) {
+                        break;
+                    }
+                    $i++;
+                }
+                if ($this->response->isStatus()) {
+                    $this->response = $this->create_sitemap_index($file_path, $file_name, $file_ext, $file_index_path);
+                }
+            } else {
+                $this->set_urlset_body();
+                $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+                $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
+            }
+        } else {
+            $this->set_urlset_body();
+            $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+            $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
+        }
+        return $this->response;
     }
 }

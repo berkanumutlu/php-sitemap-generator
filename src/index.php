@@ -101,6 +101,28 @@ $sitemap_generator = new SitemapGenerator();
                                            placeholder="File Ext"
                                            value="<?= $sitemap_generator->getSitemap()->getFileExt() ?>">
                                 </div>
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="file_name_unique"
+                                               id="file_name_unique" role="switch">
+                                        <label class="form-check-label" for="file_name_unique">Unique file name<br>(e.g.
+                                            sitemap-65f6bc7e98127.xml)</label>
+                                    </div>
+                                    <div class="form-check form-switch ms-3">
+                                        <input class="form-check-input" type="checkbox" name="file_name_date"
+                                               id="file_name_date" role="switch">
+                                        <label class="form-check-label" for="file_name_date">File name with date<br>(e.g.
+                                            sitemap-2023-03-17.xml)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="input-group align-items-center mb-3">
+                                    <label for="url_limit" class="form-label mb-0 me-2">URL Limit</label>
+                                    <input type="number" id="url_limit" name="url_limit" class="form-control"
+                                           min="0" max="50000" step="1" onkeyup="checkInputNumberValue(this)"
+                                           value="<?= $sitemap_generator->getUrlLimit() ?>">
+                                </div>
                             </div>
                             <div class="col-12">
                                 <div class="mb-3">
