@@ -5,7 +5,7 @@
  * @package    SitemapGenerator
  * @author     Berkan Ümütlü (github.com/berkanumutlu)
  * @copyright  © 2023 Berkan Ümütlü
- * @version    1.0.0
+ * @version    1.0.2
  */
 class SitemapGenerator
 {
@@ -93,6 +93,15 @@ class SitemapGenerator
      * @var float
      */
     private $priority = 0.5;
+    /**
+     * @var string[]
+     */
+    private $search_engine_list = [
+        "https://www.googleapis.com/webmasters/v3/sites/{site_url}/sitemaps/{sitemap_url}",
+        "http://www.bing.com/webmaster/ping.aspx?siteMap={sitemap_url}",
+        "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap={sitemap_url}",
+        "http://submissions.ask.com/ping?sitemap={sitemap_url}"
+    ];
 
     public function __construct()
     {
@@ -226,6 +235,22 @@ class SitemapGenerator
     public function setPriority($priority)
     {
         $this->priority = $priority;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSearchEngineList()
+    {
+        return $this->search_engine_list;
+    }
+
+    /**
+     * @param  string[]  $search_engine_list
+     */
+    public function setSearchEngineList($search_engine_list)
+    {
+        $this->search_engine_list = $search_engine_list;
     }
 
     /**
@@ -419,6 +444,7 @@ class SitemapGenerator
             if (file_exists($full_path)) {
                 $this->response->setStatus(true);
                 $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <a href="'.$file_url.'" target="_blank"><strong>'.$full_path.'</strong></a>');
+                $this->response->setData(['file_url' => $file_url]);
             } else {
                 $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <strong>'.$full_path.'</strong>');
             }
@@ -471,6 +497,41 @@ class SitemapGenerator
             $this->set_urlset_body();
             $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
             $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
+        }
+        return $this->response;
+    }
+
+    /**
+     * @param $sitemap_url
+     * @return Response
+     */
+    public function submit_sitemap($sitemap_url)
+    {
+        if (!extension_loaded('curl')) {
+            $this->response->setMessage('cURL library is not loaded.');
+            return $this->response;
+        }
+        $search_engine_list = $this->getSearchEngineList();
+        if (!empty($search_engine_list)) {
+            $response_list = array();
+            $site_url = str_replace(['http://', 'https://'], ['', ''], $this->getSitemap()->getDomain());
+            $sitemap_url = urlencode($sitemap_url);
+            foreach ($search_engine_list as $ping_url) {
+                $ping_url = str_replace('{site_url}', $site_url, $ping_url);
+                $ping_url = str_replace('{sitemap_url}', $sitemap_url, $ping_url);
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $ping_url.$sitemap_url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                curl_close($ch);
+                $response_list[] = [
+                    'url'      => $ping_url,
+                    'response' => $response
+                ];
+            }
+            $this->response->setStatus(true);
+            $this->response->setMessage('Sitemap submitting completed.');
+            $this->response->setData($response_list);
         }
         return $this->response;
     }

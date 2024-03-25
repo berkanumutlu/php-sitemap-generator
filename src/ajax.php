@@ -109,3 +109,15 @@ if (!empty($_POST['sitemap'])) {
     echo $response->toJson();
     return true;
 }
+if (!empty($_POST['submit_sitemap'])) {
+    $response = new \App\Library\Response();
+    if (empty($_POST['sitemap_url'])) {
+        $response->setMessage('Sitemap not found.');
+        echo $response->toJson();
+        exit();
+    }
+    $sitemap_generator = new SitemapGenerator();
+    $response = $sitemap_generator->submit_sitemap($_POST['sitemap_url']);
+    echo $response->toJson();
+    return true;
+}
