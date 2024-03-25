@@ -32,7 +32,7 @@ $sitemap_generator = new SitemapGenerator();
                     <h1 class="mb-0 fs-4 fw-semibold">Sitemap Generator</h1>
                 </div>
                 <div class="card-body">
-                    <form action="ajax.php" method="POST">
+                    <form action="ajax.php" method="POST" class="sitemap-generator">
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-group align-items-center mb-3">
@@ -153,7 +153,7 @@ $sitemap_generator = new SitemapGenerator();
                             </div>
                         </div>
                     </form>
-                    <div class="alert-message">
+                    <div class="alert-message alert-sitemap">
                         <hr>
                         <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
                             <div class="alert-icon alert-success">
@@ -170,6 +170,30 @@ $sitemap_generator = new SitemapGenerator();
                                 </svg>
                             </div>
                             <div class="text"></div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="ajax.php" class="btn btn-primary sitemap-submit-button" data-sitemap-url=""
+                           style="display: none;"
+                        >Submit Sitemap</a>
+                    </div>
+                    <div class="alert-message alert-sitemap-submit-button">
+                        <hr>
+                        <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
+                            <div class="alert-icon alert-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-check-circle-fill" viewBox="0 0 16 16" aria-label="Success:">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                </svg>
+                            </div>
+                            <div class="alert-icon alert-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16"
+                                     aria-label="Danger:">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                </svg>
+                            </div>
+                            <div class="text" style="word-break: break-word;"></div>
                         </div>
                     </div>
                 </div>

@@ -30,6 +30,7 @@
   "require": {
     "ext-json": "*",
     "ext-pdo": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "ext-curl": "*"
   }
 }
