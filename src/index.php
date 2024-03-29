@@ -114,6 +114,11 @@ $sitemap_generator = new SitemapGenerator();
                                         <label class="form-check-label" for="file_name_date">File name with date<br>(e.g.
                                             sitemap-2023-03-17.xml)</label>
                                     </div>
+                                    <div class="form-check form-switch ms-3">
+                                        <input class="form-check-input" type="checkbox" name="create_gzip_file"
+                                               id="create_gzip_file" role="switch">
+                                        <label class="form-check-label" for="create_gzip_file">Create gzip file</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12">

@@ -53,6 +53,9 @@ if (!empty($_POST['sitemap'])) {
         if (!empty($_POST['url_limit'])) {
             $sitemap_generator->setUrlLimit(trim($_POST['url_limit']));
         }
+        if (!empty($_POST['create_gzip_file'])) {
+            $sitemap_generator->setCreateGzipFile(trim($_POST['create_gzip_file']));
+        }
         /*
          * Adding base url
          */

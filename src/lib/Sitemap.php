@@ -5,7 +5,7 @@
  * @package    Sitemap
  * @author     Berkan Ümütlü (github.com/berkanumutlu)
  * @copyright  © 2023 Berkan Ümütlü
- * @version    1.0.0
+ * @version    1.0.2
  * @see        https://www.sitemaps.org/protocol.html
  * @see        https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview
  */
@@ -139,6 +139,9 @@ class Sitemap
      */
     public function setFileExt($file_ext)
     {
+        if (mb_substr($file_ext, 0, 1) !== '.') {
+            $file_ext = '.'.$file_ext;
+        }
         $this->file_ext = $file_ext;
     }
 
