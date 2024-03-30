@@ -44,8 +44,10 @@ jQuery(function ($) {
     });
     $("form.sitemap-generator").submit(function (event) {
         event.preventDefault();
-        var submit_sitemap_button = $('.sitemap-submit-button');
+        let submit_sitemap_button = $('.sitemap-submit-button');
         submit_sitemap_button.hide();
+        let alert_submit_button = $('.alert-message.alert-sitemap-submit-button');
+        alert_submit_button.hide();
         var url = $(this).attr('action');
         var method = $(this).attr('method');
         var formData = $(this).serializeArray();
@@ -58,11 +60,9 @@ jQuery(function ($) {
             dataType: "JSON"
         }).done(function (response) {
             let alert = $('.alert-message.alert-sitemap');
-            let alert_submit_button = $('.alert-message.alert-sitemap-submit-button');
             let alertIcon = alert.find('.alert .alert-icon');
             let alertText = alert.find('.alert .text');
             alert.hide();
-            alert_submit_button.hide();
             alertIcon.hide();
             alertText.text();
             if (response.hasOwnProperty('message')) {

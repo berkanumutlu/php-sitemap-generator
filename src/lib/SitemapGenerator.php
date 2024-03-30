@@ -88,7 +88,7 @@ class SitemapGenerator
      * Please note that the priority you assign to a page is not likely to influence the position of your URLs in a search engine's result pages.
      * Search engines may use this information when selecting between URLs on the same site, so you can use this tag to increase the likelihood that your most important pages are present in a search index.
      *
-     * Also, please note that assigning a high priority to all of the URLs on your site is not likely to help you. Since the priority is relative, it is only used to select between URLs on your site.
+     * Also, please note that assigning a high priority to all the URLs on your site is not likely to help you. Since the priority is relative, it is only used to select between URLs on your site.
      *
      * @var float
      */
@@ -98,14 +98,18 @@ class SitemapGenerator
      */
     private $search_engine_list = [
         "https://www.googleapis.com/webmasters/v3/sites/{site_url}/sitemaps/{sitemap_url}",
-        "http://www.bing.com/webmaster/ping.aspx?siteMap={sitemap_url}",
-        "http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap={sitemap_url}",
-        "http://submissions.ask.com/ping?sitemap={sitemap_url}"
+        "https://www.bing.com/webmaster/ping.aspx?siteMap={sitemap_url}",
+        "https://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap={sitemap_url}",
+        "https://submissions.ask.com/ping?sitemap={sitemap_url}"
     ];
     /**
      * @var bool
      */
     private $create_gzip_file = false;
+    /**
+     * @var bool
+     */
+    private $create_robots_txt = false;
 
     public function __construct()
     {
@@ -260,7 +264,7 @@ class SitemapGenerator
     /**
      * @return bool
      */
-    public function isCreateGzipFile(): bool
+    public function isCreateGzipFile()
     {
         return $this->create_gzip_file;
     }
@@ -268,9 +272,25 @@ class SitemapGenerator
     /**
      * @param  bool  $create_gzip_file
      */
-    public function setCreateGzipFile(bool $create_gzip_file)
+    public function setCreateGzipFile($create_gzip_file)
     {
         $this->create_gzip_file = $create_gzip_file;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCreateRobotsTxt()
+    {
+        return $this->create_robots_txt;
+    }
+
+    /**
+     * @param  bool  $create_robots_txt
+     */
+    public function setCreateRobotsTxt($create_robots_txt)
+    {
+        $this->create_robots_txt = $create_robots_txt;
     }
 
     /**
@@ -287,7 +307,7 @@ class SitemapGenerator
      */
     public function set_url_loc($url_loc)
     {
-        if (strpos($url_loc, $this->getSitemap()->getDomain()) == false) {
+        if (!strpos($url_loc, $this->getSitemap()->getDomain())) {
             $url_loc = $this->getSitemap()->getDomain().'/'.$url_loc;
         }
         $this->url['loc'] = $url_loc;
@@ -336,7 +356,7 @@ class SitemapGenerator
      */
     public function set_url_image_loc($url_image_loc)
     {
-        if (strpos($url_image_loc, $this->getSitemap()->getDomain()) == false) {
+        if (!strpos($url_image_loc, $this->getSitemap()->getDomain())) {
             $url_image_loc = $this->getSitemap()->getDomain().'/'.$url_image_loc;
         }
         $this->url_image['loc'] = $url_image_loc;
@@ -352,15 +372,15 @@ class SitemapGenerator
     }
 
     /**
-     * @param $url_list
+     * @param  array  $url_list
      * @return void
      */
-    public function set_urlset_body($url_list = array())
+    public function set_urlset_body(array $url_list = array())
     {
         if (empty($url_list)) {
             $url_list = $this->getUrllist();
         }
-        $data = '<!--created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
+        $data = '<!--Created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
         if (!empty($url_list)) {
             foreach ($url_list as $url) {
                 $item = (object) $url;
@@ -394,7 +414,7 @@ class SitemapGenerator
      * @param $path
      * @return Response
      */
-    public function create_file_path($path): Response
+    public function create_file_path($path)
     {
         $this->response->setStatus(false);
         $dir = is_file($path) ? pathinfo($path, PATHINFO_DIRNAME) : $path;
@@ -405,44 +425,45 @@ class SitemapGenerator
                 chmod($dir, 0777);
                 $this->response->setStatus(true);
             } else {
-                $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong> Dir path: <strong>'.$dir.'</strong>');
+                $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>, Dir path: <strong>'.$dir.'</strong>');
             }
         }
         return $this->response;
     }
 
     /**
-     * @param $file_path
      * @param $file_name
+     * @param $file_path
      * @param $file_ext
-     * @param $index_dir
+     * @param $index_path
      * @return Response
      */
-    public function create_sitemap_index($file_path, $file_name, $file_ext, $index_dir): Response
+    public function create_sitemap_index($file_name, $file_path, $file_ext, $index_path)
     {
-        $sitemap_list = scandir($index_dir);
+        $this->response->setStatus(false);
+        $sitemap_list = scandir($index_path);
         if (!empty($sitemap_list) && count($sitemap_list) > 2) {
             $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
             $sitemap_index_footer = '</sitemapindex>';
             $sitemap_index_content = '';
-            foreach ($sitemap_list as $sitemap) {
-                if ($sitemap === '.' || $sitemap === '..') {
+            foreach ($sitemap_list as $sitemap_file) {
+                if ($sitemap_file === '.' || $sitemap_file === '..') {
                     continue;
                 }
-                $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '', $index_dir).$sitemap;
-                $sitemap_index_content .= '<sitemap>
-                    <loc>'.$file_url.'</loc>
-                    <lastmod>'.date('Y-m-d', filectime($index_dir.$sitemap)).'</lastmod>
-                </sitemap>';
+                $sitemap_file_path_info = pathinfo($sitemap_file);
+                if ($sitemap_file_path_info['extension'] == 'xml') {
+                    $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                            $index_path).$sitemap_file;
+                    $sitemap_index_content .= '<sitemap>
+                            <loc>'.$sitemap_file_url.'</loc>
+                            <lastmod>'.date('Y-m-d', filectime($index_path.$sitemap_file)).'</lastmod>
+                        </sitemap>';
+                }
             }
-            $file_data = $sitemap_index_header.$sitemap_index_content.$sitemap_index_footer;
-            $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
-            if ($this->isCreateGzipFile()) {
-                $this->write_gzip_files($file_name, $file_path, $file_ext);
-            }
+            $sitemap_index_file_data = $sitemap_index_header.$sitemap_index_content.$sitemap_index_footer;
+            $this->response = $this->write($file_name, $file_path, $file_ext, $sitemap_index_file_data);
         } else {
-            $this->response->setStatus(false);
-            $this->response->setMessage('Sitemap index files not found.<br>Date: <strong>'.$this->response->getDate().'</strong>,  Sitemap index dir: <strong>'.$index_dir.'</strong>');
+            $this->response->setMessage('Sitemap index files not found.<br>Date: <strong>'.$this->response->getDate().'</strong>, Sitemap index dir: <strong>'.$index_path.'</strong>');
         }
         return $this->response;
     }
@@ -454,22 +475,27 @@ class SitemapGenerator
      * @param $file_data
      * @return Response
      */
-    public function write($file_name, $file_path, $file_ext, $file_data): Response
+    public function write($file_name, $file_path, $file_ext, $file_data)
     {
         $this->response->setStatus(false);
         $create_file_path = $this->create_file_path($file_path);
-        $full_path = $file_path.$file_name.$file_ext;
+        $sitemap_file_path = $file_path.$file_name.$file_ext;
         if ($create_file_path->isStatus()) {
-            $path_info = pathinfo($full_path);
-            $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                    $path_info['dirname']).'/'.$path_info['basename'].'?v='.$this->response->getDate();
-            file_put_contents($full_path, $file_data);
-            if (file_exists($full_path)) {
+            $result = file_put_contents($sitemap_file_path, $file_data);
+            $date = $this->response->getDate();
+            if (!empty($result)) {
                 $this->response->setStatus(true);
-                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <a href="'.$file_url.'" target="_blank"><strong>'.$full_path.'</strong></a>');
-                $this->response->setData(['file_url' => $file_url]);
+                $sitemap_file_path_info = pathinfo($sitemap_file_path);
+                $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
+                if ($this->isCreateGzipFile()) {
+                    $sitemap_file_url .= '.gz';
+                }
+                $sitemap_file_url .= '?v='.urlencode($date);
+                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$date.'</strong>, File path: <a href="'.$sitemap_file_url.'" target="_blank"><strong>'.$sitemap_file_path.'</strong></a>');
+                $this->response->setData(['file_url' => $sitemap_file_url]);
             } else {
-                $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$this->response->getDate().'</strong>,  File path: <strong>'.$full_path.'</strong>');
+                $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$date.'</strong>, File path: <strong>'.$sitemap_file_path.'</strong>');
             }
         } else {
             $this->response = $create_file_path;
@@ -491,16 +517,16 @@ class SitemapGenerator
         gzwrite($gzip, $file_data);
         $result = gzclose($gzip);
         $date = $this->response->getDate();
-        $path_info = pathinfo($gzip_file_path);
-        $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                $path_info['dirname']).'/'.$path_info['basename'].'?v='.$date;
         if ($result) {
+            $gzip_file_path_info = pathinfo($gzip_file_path);
+            $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
             $message = 'Sitemap gzip file created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
         } else {
             $message = 'Sitemap gzip file could not write.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <strong>'.$gzip_file_path.'</strong>';
         }
         $response_message = $this->response->getMessage();
-        $this->response->setMessage($response_message.'<br>'.$message);
+        $this->response->setMessage($response_message.'<br><br>'.$message);
     }
 
     /**
@@ -512,11 +538,11 @@ class SitemapGenerator
     public function write_gzip_files($file_name, $folder_path, $file_ext)
     {
         $gzip_file_path = $folder_path.$file_name.$file_ext.'.gz';
-        $files = scandir($folder_path);
-        $gzip = gzopen($gzip_file_path, 'w9');
         $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         $sitemap_index_footer = '</sitemapindex>';
-        $file_content = '';
+        $gzip_file_content = '';
+        $gzip = gzopen($gzip_file_path, 'w9');
+        $files = scandir($folder_path);
         foreach ($files as $file) {
             if ($file === '.' || $file === '..') {
                 continue;
@@ -528,11 +554,11 @@ class SitemapGenerator
                     if ($folder_file === '.' || $folder_file === '..') {
                         continue;
                     }
-                    $path_info = pathinfo($folder_file);
-                    if ($path_info['extension'] == 'gz') {
+                    $folder_file_path_info = pathinfo($folder_file);
+                    if ($folder_file_path_info['extension'] == 'gz') {
                         $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
                                 $folder_file_path).'/'.$folder_file;
-                        $file_content .= '<sitemap>
+                        $gzip_file_content .= '<sitemap>
                                 <loc>'.$file_url.'</loc>
                                 <lastmod>'.date('Y-m-d', filectime($folder_file_path.'/'.$folder_file)).'</lastmod>
                         </sitemap>';
@@ -540,73 +566,75 @@ class SitemapGenerator
                 }
             }
         }
-        gzwrite($gzip, $sitemap_index_header.$file_content.$sitemap_index_footer);
+        gzwrite($gzip, $sitemap_index_header.$gzip_file_content.$sitemap_index_footer);
         $result = gzclose($gzip);
         $date = $this->response->getDate();
-        $path_info = pathinfo($gzip_file_path);
-        $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                $path_info['dirname']).'/'.$path_info['basename'].'?v='.$date;
         if ($result) {
+            $gzip_file_path_info = pathinfo($gzip_file_path);
+            $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
             $message = 'Sitemap gzip files created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
         } else {
             $message = 'Sitemap gzip files could not write.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <strong>'.$gzip_file_path.'</strong>';
         }
         $response_message = $this->response->getMessage();
-        $this->response->setMessage($response_message.'<br>'.$message);
+        $this->response->setMessage($response_message.'<br><br>'.$message);
     }
 
     /**
      * @return Response
      */
-    public function generate(): Response
+    public function generate()
     {
+        $create_sitemap_index = false;
         $file_path = $this->sitemap->getFilePath();
         $file_name = $this->sitemap->getFileName();
         $file_ext = $this->sitemap->getFileExt();
-        $url_list = $this->getUrllist();
         $url_limit = $this->getUrlLimit();
         /*
          * If url limit is not 0 (zero)
          */
         if (!empty($url_limit)) {
+            $url_list = $this->getUrllist();
             $url_list_chunk = array_chunk($url_list, $url_limit);
             /*
              * If there is more than 1 file, a sitemap index will be created
              */
             if (count($url_list_chunk) > 1) {
-                $file_index_path = $file_path.'index/';
+                $create_sitemap_index = true;
+                $index_file_path = $file_path.'index/';
                 $i = 1;
                 foreach ($url_list_chunk as $list) {
                     $this->set_urlset_body($list);
-                    $file_index_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
-                    $file_index_name = $file_name.'-'.$i;
-                    $this->response = $this->write($file_index_name, $file_index_path, $file_ext, $file_index_data);
+                    $index_file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
+                    $index_file_name = $file_name.'-'.$i;
+                    $this->response = $this->write($index_file_name, $index_file_path, $file_ext, $index_file_data);
                     if (!$this->response->isStatus()) {
                         break;
                     }
                     if ($this->isCreateGzipFile()) {
-                        $this->write_gzip_file($file_index_name, $file_index_path, $file_ext, $file_index_data);
+                        $this->write_gzip_file($index_file_name, $index_file_path, $file_ext, $index_file_data);
                     }
                     $i++;
                 }
                 if ($this->response->isStatus()) {
-                    $this->response = $this->create_sitemap_index($file_path, $file_name, $file_ext, $file_index_path);
-                }
-            } else {
-                $this->set_urlset_body();
-                $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
-                $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
-                if ($this->isCreateGzipFile()) {
-                    $this->write_gzip_file($file_name, $file_path, $file_ext, $file_data);
+                    $this->response = $this->create_sitemap_index($file_name, $file_path, $file_ext, $index_file_path);
+                    if ($this->isCreateGzipFile()) {
+                        $this->write_gzip_files($file_name, $file_path, $file_ext);
+                    }
                 }
             }
-        } else {
+        }
+        if (!$create_sitemap_index) {
             $this->set_urlset_body();
             $file_data = $this->sitemap->getHeader().$this->sitemap->getUrlsetHeader().$this->sitemap->getUrlsetBody().$this->sitemap->getUrlsetFooter();
             $this->response = $this->write($file_name, $file_path, $file_ext, $file_data);
             if ($this->isCreateGzipFile()) {
                 $this->write_gzip_file($file_name, $file_path, $file_ext, $file_data);
             }
+        }
+        if ($this->isCreateRobotsTxt()) {
+            $this->create_robots_txt($file_name, $file_path, $file_ext);
         }
         return $this->response;
     }
@@ -615,8 +643,9 @@ class SitemapGenerator
      * @param $sitemap_url
      * @return Response
      */
-    public function submit_sitemap($sitemap_url): Response
+    public function submit_sitemap($sitemap_url)
     {
+        $this->response->setStatus(false);
         if (!extension_loaded('curl')) {
             $this->response->setMessage('cURL library is not loaded.');
             return $this->response;
@@ -626,23 +655,87 @@ class SitemapGenerator
             $response_list = array();
             $site_url = str_replace(['http://', 'https://'], ['', ''], $this->getSitemap()->getDomain());
             $sitemap_url = urlencode($sitemap_url);
-            foreach ($search_engine_list as $ping_url) {
-                $ping_url = str_replace('{site_url}', $site_url, $ping_url);
-                $ping_url = str_replace('{sitemap_url}', $sitemap_url, $ping_url);
+            foreach ($search_engine_list as $search_engine_url) {
+                $search_engine_url = str_replace('{site_url}', $site_url, $search_engine_url);
+                $search_engine_url = str_replace('{sitemap_url}', $sitemap_url, $search_engine_url);
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $ping_url.$sitemap_url);
+                curl_setopt($ch, CURLOPT_URL, $search_engine_url.$sitemap_url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $response = curl_exec($ch);
                 curl_close($ch);
                 $response_list[] = [
-                    'url'      => $ping_url,
+                    'url'      => $search_engine_url,
                     'response' => $response
                 ];
             }
             $this->response->setStatus(true);
-            $this->response->setMessage('Sitemap submitting completed.');
+            $this->response->setMessage('Submitting sitemap completed.');
             $this->response->setData($response_list);
+        } else {
+            $this->response->setMessage('Search engine list empty.');
         }
         return $this->response;
+    }
+
+    /**
+     * More information about robots.txt: https://www.robotstxt.org/robotstxt.html
+     * @param $file_name
+     * @param $file_path
+     * @param $file_ext
+     * @return void
+     */
+    public function create_robots_txt($file_name, $file_path, $file_ext)
+    {
+        $previous_dir = dirname($file_path).'/';
+        $robots_txt_file = $previous_dir.'robots.txt';
+        $robots_txt_file_content = "# Created with PHP Sitemap Generator by Berkan Umutlu (https://github.com/berkanumutlu/php-sitemap-generator)";
+        /*
+         * If the robots.txt file exists, its content is retrieved and only the URL value starting with "Sitemap:" is changed.
+         * Else creating a new robots.txt file
+         */
+        if (file_exists($robots_txt_file)) {
+            $current_robots_txt_file = explode("\n", file_get_contents($robots_txt_file));
+            foreach ($current_robots_txt_file as $key => $value) {
+                if (substr($value, 0, 8) == 'Sitemap:') {
+                    unset($current_robots_txt_file[$key]);
+                } elseif ($value == $robots_txt_file_content) {
+                    $robots_txt_file_content .= "\n";
+                } else {
+                    $robots_txt_file_content .= $value."\n";
+                }
+            }
+        } else {
+            $robots_txt_file_content .= "\n\nUser-agent: *\nAllow: /\n";
+        }
+        /*
+         * Adding sitemap file url
+         */
+        $sitemap_file_path = $file_path.$file_name.$file_ext;
+        $sitemap_file_path_info = pathinfo($sitemap_file_path);
+        $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
+        if ($this->isCreateGzipFile()) {
+            $sitemap_file_url .= '.gz';
+        }
+        $date = $this->response->getDate();
+        $sitemap_file_url .= '?v='.urlencode($date);
+        $robots_txt_file_content .= "Sitemap: $sitemap_file_url";
+        if (!file_exists($robots_txt_file)) {
+            $robots_txt_file_content .= "Sitemap: $sitemap_file_url\n";
+        }
+        /*
+         * Writing robots.txt file contents
+         */
+        $result = file_put_contents($robots_txt_file, $robots_txt_file_content);
+        if (!empty($result)) {
+            $robots_txt_file_path_info = pathinfo($robots_txt_file);
+            $robots_txt_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $robots_txt_file_path_info['dirname']).'/'.$robots_txt_file_path_info['basename'].'?v='.urlencode($date);
+            $message = 'robots.txt file updated successfully.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <a href="'.$robots_txt_file_url.'" target="_blank"><strong>'.$robots_txt_file.'</strong></a>';
+        } else {
+            $message = 'robots.txt file could not write.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <strong>'.$robots_txt_file.'</strong>';
+        }
+        $response_message = $this->response->getMessage();
+        $this->response->setMessage($response_message.'<br><br>'.$message);
     }
 }

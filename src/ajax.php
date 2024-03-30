@@ -1,5 +1,5 @@
 <?php
-define('BASE_PATH', __DIR__.'/');
+const BASE_PATH = __DIR__.'/';
 require_once '../vendor/autoload.php';
 require_once 'config/db.php';
 
@@ -55,6 +55,9 @@ if (!empty($_POST['sitemap'])) {
         }
         if (!empty($_POST['create_gzip_file'])) {
             $sitemap_generator->setCreateGzipFile(trim($_POST['create_gzip_file']));
+        }
+        if (!empty($_POST['create_robots_txt'])) {
+            $sitemap_generator->setCreateRobotsTxt(trim($_POST['create_robots_txt']));
         }
         /*
          * Adding base url
