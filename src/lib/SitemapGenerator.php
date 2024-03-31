@@ -443,21 +443,25 @@ class SitemapGenerator
         $this->response->setStatus(false);
         $sitemap_list = scandir($index_path);
         if (!empty($sitemap_list) && count($sitemap_list) > 2) {
-            $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!--Created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
             $sitemap_index_footer = '</sitemapindex>';
             $sitemap_index_content = '';
+            $sitemap_file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                    $index_path);
             foreach ($sitemap_list as $sitemap_file) {
                 if ($sitemap_file === '.' || $sitemap_file === '..') {
                     continue;
                 }
                 $sitemap_file_path_info = pathinfo($sitemap_file);
                 if ($sitemap_file_path_info['extension'] == 'xml') {
-                    $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                            $index_path).$sitemap_file;
                     $sitemap_index_content .= '<sitemap>
-                            <loc>'.$sitemap_file_url.'</loc>
-                            <lastmod>'.date('Y-m-d', filectime($index_path.$sitemap_file)).'</lastmod>
-                        </sitemap>';
+                            <loc>'.$sitemap_file_url.$sitemap_file.'</loc>
+                            <lastmod>'.date('Y-m-d', filectime($index_path.$sitemap_file)).'</lastmod>';
+                    if ($this->getPriority()) {
+                        $sitemap_index_content .= '<priority>'.$this->getPriority().'</priority>';
+                    }
+                    $sitemap_index_content .= '</sitemap>';
                 }
             }
             $sitemap_index_file_data = $sitemap_index_header.$sitemap_index_content.$sitemap_index_footer;
