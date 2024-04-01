@@ -13,19 +13,19 @@
 
 # PHP Sitemap Generator
 
-This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, change frequency, priority and image properties.
+This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, change frequency, priority and image properties. URL limits can be added to sitemap files, gzip compression can be done, and the content of the robots.txt file can be updated automatically and the sitemap file can submit to search engines.
 
 Sitemap format: http://www.sitemaps.org/protocol.html
 
 ## Sitemap file
 
-After creating your sitemap.xml file, you should add the XML file to your `robots.txt`.
+~~After creating your sitemap.xml file, you should add the XML file to your `robots.txt`.~~
 
-Line for the robots.txt:
+~~Line for the robots.txt:~~
 
-```
-Sitemap: http://example.com/sitemap/sitemap.xml
-```
+~~Sitemap: http://example.com/sitemap/sitemap.xml~~
+
+Now you can create or update your robots.txt automatically.
 
 ## Output
 
@@ -84,6 +84,100 @@ Example output when generating a sitemap
         <priority>0.8</priority>
     </url>
 </urlset>
+```
+
+Example output when generating sitemap with gzip
+
+```XML
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!--Created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-1.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-10.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-11.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-12.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-13.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-14.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-15.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-16.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-17.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-2.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-3.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-4.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-5.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-6.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-7.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-8.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/sitemap/index/sitemap-9.xml</loc>
+        <lastmod>2024-03-29</lastmod>
+        <priority>0.5</priority>
+    </sitemap>
+</sitemapindex>
 ```
 
 ## Screenshots

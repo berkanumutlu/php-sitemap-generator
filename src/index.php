@@ -18,7 +18,7 @@ $sitemap_generator = new SitemapGenerator();
     <meta name="author" content="Berkan Ümütlü">
     <meta name="copyright" content="Berkan Ümütlü">
     <meta name="owner" content="Berkan Ümütlü">
-    <meta name="url" content="http://github.com/berkanumutlu">
+    <meta name="url" content="https://github.com/berkanumutlu">
     <link rel="stylesheet" href="assets/plugins/bootstrap-5.3.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/plugins/flatpickr/flatpickr.min.css">
     <link rel="stylesheet" href="assets/web/css/style.min.css">
@@ -32,7 +32,7 @@ $sitemap_generator = new SitemapGenerator();
                     <h1 class="mb-0 fs-4 fw-semibold">Sitemap Generator</h1>
                 </div>
                 <div class="card-body">
-                    <form action="ajax.php" method="POST">
+                    <form action="ajax.php" method="POST" class="sitemap-generator">
                         <div class="row">
                             <div class="col-12">
                                 <div class="input-group align-items-center mb-3">
@@ -101,22 +101,8 @@ $sitemap_generator = new SitemapGenerator();
                                            placeholder="File Ext"
                                            value="<?= $sitemap_generator->getSitemap()->getFileExt() ?>">
                                 </div>
-                                <div class="input-group mb-3">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="file_name_unique"
-                                               id="file_name_unique" role="switch">
-                                        <label class="form-check-label" for="file_name_unique">Unique file name<br>(e.g.
-                                            sitemap-65f6bc7e98127.xml)</label>
-                                    </div>
-                                    <div class="form-check form-switch ms-3">
-                                        <input class="form-check-input" type="checkbox" name="file_name_date"
-                                               id="file_name_date" role="switch">
-                                        <label class="form-check-label" for="file_name_date">File name with date<br>(e.g.
-                                            sitemap-2023-03-17.xml)</label>
-                                    </div>
-                                </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 col-md-4">
                                 <div class="input-group align-items-center mb-3">
                                     <label for="url_limit" class="form-label mb-0 me-2">URL Limit</label>
                                     <input type="number" id="url_limit" name="url_limit" class="form-control"
@@ -124,25 +110,61 @@ $sitemap_generator = new SitemapGenerator();
                                            value="<?= $sitemap_generator->getUrlLimit() ?>">
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 col-md-4">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="file_name_unique"
+                                               id="file_name_unique" role="switch">
+                                        <label class="form-check-label" for="file_name_unique">Unique file name
+                                            <br><small><?= '(e.g. '.$sitemap_generator->getSitemap()->getFileName().'-'.uniqid().$sitemap_generator->getSitemap()->getFileExt().')' ?></small></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch ms-3">
+                                        <input class="form-check-input" type="checkbox" name="file_name_date"
+                                               id="file_name_date" role="switch">
+                                        <label class="form-check-label" for="file_name_date">File name with date
+                                            <br><small><?= '(e.g. '.$sitemap_generator->getSitemap()->getFileName().'-'.date('Y-m-d').$sitemap_generator->getSitemap()->getFileExt().')' ?></small></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-5">
                                 <div class="mb-3">
                                     <label for="file_header" class="form-label">File Header</label>
                                     <textarea name="file_header" id="file_header" class="form-control"
-                                              rows="1"><?= $sitemap_generator->getSitemap()->getHeader() ?></textarea>
+                                              rows="6"><?= $sitemap_generator->getSitemap()->getHeader() ?></textarea>
                                 </div>
                             </div>
-                            <div class="col-12">
+                            <div class="col-12 col-md-7">
                                 <div class="mb-3">
                                     <label for="file_urlset_header" class="form-label">Urlset Header</label>
                                     <textarea name="file_urlset_header" id="file_urlset_header" class="form-control"
-                                              rows="1"><?= $sitemap_generator->getSitemap()->getUrlsetHeader() ?></textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="file_urlset_footer" class="form-label">Urlset Footer</label>
+                                              rows="3"><?= $sitemap_generator->getSitemap()->getUrlsetHeader() ?></textarea>
+                                    <label for="file_urlset_footer" class="form-label mt-1">Urlset Footer</label>
                                     <textarea name="file_urlset_footer" id="file_urlset_footer" class="form-control"
                                               rows="1"><?= $sitemap_generator->getSitemap()->getUrlsetFooter() ?></textarea>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch ms-3">
+                                        <input class="form-check-input" type="checkbox" name="create_gzip_file"
+                                               id="create_gzip_file" role="switch">
+                                        <label class="form-check-label" for="create_gzip_file">Create gzip file
+                                            <br><small><?= '(output: '.$sitemap_generator->getSitemap()->getFileName().$sitemap_generator->getSitemap()->getFileExt().'.gz)' ?></small></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="input-group mb-3">
+                                    <div class="form-check form-switch ms-3">
+                                        <input class="form-check-input" type="checkbox" name="create_robots_txt"
+                                               id="create_robots_txt" role="switch">
+                                        <label class="form-check-label" for="create_robots_txt">Create/Update robots.txt
+                                            <br><small>(output: robots.txt)</small></label>
+                                    </div>
                                 </div>
                             </div>
                             <hr>
@@ -153,7 +175,7 @@ $sitemap_generator = new SitemapGenerator();
                             </div>
                         </div>
                     </form>
-                    <div class="alert-message">
+                    <div class="alert-message alert-sitemap">
                         <hr>
                         <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
                             <div class="alert-icon alert-success">
@@ -170,6 +192,30 @@ $sitemap_generator = new SitemapGenerator();
                                 </svg>
                             </div>
                             <div class="text"></div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="ajax.php" class="btn btn-primary sitemap-submit-button" data-sitemap-url=""
+                           style="display: none;"
+                        >Submit Sitemap</a>
+                    </div>
+                    <div class="alert-message alert-sitemap-submit-button">
+                        <hr>
+                        <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
+                            <div class="alert-icon alert-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-check-circle-fill" viewBox="0 0 16 16" aria-label="Success:">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                </svg>
+                            </div>
+                            <div class="alert-icon alert-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16"
+                                     aria-label="Danger:">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                </svg>
+                            </div>
+                            <div class="text" style="word-break: break-word;"></div>
                         </div>
                     </div>
                 </div>

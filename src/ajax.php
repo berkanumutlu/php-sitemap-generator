@@ -1,5 +1,5 @@
 <?php
-define('BASE_PATH', __DIR__.'/');
+const BASE_PATH = __DIR__.'/';
 require_once '../vendor/autoload.php';
 require_once 'config/db.php';
 
@@ -52,6 +52,12 @@ if (!empty($_POST['sitemap'])) {
         }
         if (!empty($_POST['url_limit'])) {
             $sitemap_generator->setUrlLimit(trim($_POST['url_limit']));
+        }
+        if (!empty($_POST['create_gzip_file'])) {
+            $sitemap_generator->setCreateGzipFile(trim($_POST['create_gzip_file']));
+        }
+        if (!empty($_POST['create_robots_txt'])) {
+            $sitemap_generator->setCreateRobotsTxt(trim($_POST['create_robots_txt']));
         }
         /*
          * Adding base url
@@ -106,6 +112,18 @@ if (!empty($_POST['sitemap'])) {
         $response->setStatusText($e->getMessage());
         $response->setMessage('The sitemap could not be created.');
     }
+    echo $response->toJson();
+    return true;
+}
+if (!empty($_POST['submit_sitemap'])) {
+    $response = new \App\Library\Response();
+    if (empty($_POST['sitemap_url'])) {
+        $response->setMessage('Sitemap not found.');
+        echo $response->toJson();
+        exit();
+    }
+    $sitemap_generator = new SitemapGenerator();
+    $response = $sitemap_generator->submit_sitemap($_POST['sitemap_url']);
     echo $response->toJson();
     return true;
 }

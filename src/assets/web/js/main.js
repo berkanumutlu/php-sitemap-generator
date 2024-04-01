@@ -42,8 +42,12 @@ jQuery(function ($) {
             input_domain.val(input_domain_val);
         }
     });
-    $("form").submit(function (event) {
+    $("form.sitemap-generator").submit(function (event) {
         event.preventDefault();
+        let submit_sitemap_button = $('.sitemap-submit-button');
+        submit_sitemap_button.hide();
+        let alert_submit_button = $('.alert-message.alert-sitemap-submit-button');
+        alert_submit_button.hide();
         var url = $(this).attr('action');
         var method = $(this).attr('method');
         var formData = $(this).serializeArray();
@@ -55,7 +59,7 @@ jQuery(function ($) {
             data: formData,
             dataType: "JSON"
         }).done(function (response) {
-            let alert = $('.alert-message');
+            let alert = $('.alert-message.alert-sitemap');
             let alertIcon = alert.find('.alert .alert-icon');
             let alertText = alert.find('.alert .text');
             alert.hide();
@@ -63,6 +67,54 @@ jQuery(function ($) {
             alertText.text();
             if (response.hasOwnProperty('message')) {
                 alertText.html(response.message);
+                alert.show();
+            }
+            if (response.hasOwnProperty('status')) {
+                if (response.status) {
+                    alert.find('.alert').removeClass('alert-danger').addClass('alert-success');
+                    alertIcon.closest('.alert-success').show();
+                    alertIcon.closest('.alert-danger').hide();
+                    submit_sitemap_button.show();
+                } else {
+                    alert.find('.alert').removeClass('alert-success').addClass('alert-danger');
+                    alertIcon.closest('.alert-danger').show();
+                    alertIcon.closest('.alert-success').hide();
+                }
+            }
+            if (response.data.hasOwnProperty('file_url')) {
+                submit_sitemap_button.attr('data-sitemap-url', response.data.file_url)
+            }
+        });
+    });
+    $(".sitemap-submit-button").on("click", function (event) {
+        event.preventDefault();
+        var url = $(this).attr('href');
+        var sitemap_url = $(this).data('sitemap-url');
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {'submit_sitemap': 1, 'sitemap_url': sitemap_url},
+            dataType: "JSON"
+        }).done(function (response) {
+            let alert = $('.alert-message.alert-sitemap-submit-button');
+            let alertIcon = alert.find('.alert .alert-icon');
+            let alertText = alert.find('.alert .text');
+            alert.hide();
+            alertIcon.hide();
+            alertText.text();
+            if (response.hasOwnProperty('message')) {
+                alertText.html(response.message);
+                alert.show();
+            }
+            if (response.hasOwnProperty('data')) {
+                if ($.isArray(response.data)) {
+                    var list_html = '<ul class="list-group list-unstyled mt-3">';
+                    $.each(response.data, function (key, value) {
+                        list_html += '<li class="mb-3"><div><strong>URL</strong>: ' + value.url + '</div><div><strong>Response</strong>: ' + value.response + '</div></li>';
+                    });
+                    list_html += '</ul>';
+                    alertText.append(list_html);
+                }
                 alert.show();
             }
             if (response.hasOwnProperty('status')) {

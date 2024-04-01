@@ -1,0 +1,6 @@
+# Created with PHP Sitemap Generator by Berkan Umutlu (https://github.com/berkanumutlu/php-sitemap-generator)
+
+User-agent: *
+Allow: /
+
+Sitemap: http://localhost/sitemap/sitemap.xml?v=2024-03-30+15%3A51%3A40
