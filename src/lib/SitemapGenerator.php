@@ -490,13 +490,17 @@ class SitemapGenerator
             if (!empty($result)) {
                 $this->response->setStatus(true);
                 $sitemap_file_path_info = pathinfo($sitemap_file_path);
-                $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                $sitemap_file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
+                $sitemap_file_base_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
                         $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
                 if ($this->isCreateGzipFile()) {
                     $sitemap_file_url .= '.gz';
+                    $sitemap_file_base_url .= '.gz';
                 }
                 $sitemap_file_url .= '?v='.urlencode($date);
-                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$date.'</strong>, File path: <a href="'.$sitemap_file_url.'" target="_blank"><strong>'.$sitemap_file_path.'</strong></a>');
+                $sitemap_file_base_url .= '?v='.urlencode($date);
+                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$date.'</strong>, File path: <a href="'.$sitemap_file_base_url.'" target="_blank"><strong>'.$sitemap_file_path.'</strong></a>');
                 $this->response->setData(['file_url' => $sitemap_file_url]);
             } else {
                 $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$date.'</strong>, File path: <strong>'.$sitemap_file_path.'</strong>');
@@ -560,7 +564,7 @@ class SitemapGenerator
                     }
                     $folder_file_path_info = pathinfo($folder_file);
                     if ($folder_file_path_info['extension'] == 'gz') {
-                        $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
                                 $folder_file_path).'/'.$folder_file;
                         $gzip_file_content .= '<sitemap>
                                 <loc>'.$file_url.'</loc>
@@ -716,7 +720,7 @@ class SitemapGenerator
          */
         $sitemap_file_path = $file_path.$file_name.$file_ext;
         $sitemap_file_path_info = pathinfo($sitemap_file_path);
-        $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+        $sitemap_file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
                 $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
         if ($this->isCreateGzipFile()) {
             $sitemap_file_url .= '.gz';
