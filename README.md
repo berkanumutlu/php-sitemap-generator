@@ -13,7 +13,7 @@
 
 # PHP Sitemap Generator
 
-This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, change frequency, priority and image properties. URL limits can be added to sitemap files, gzip compression can be done, and the content of the robots.txt file can be updated automatically and the sitemap file can submit to search engines.
+This project can be used to generate sitemaps. It can build a sitemap file from a list of URLs. The URLs may have attached the last modification date, change frequency, priority and image properties. URL limits can be added to sitemap files, gzip compression can be done, and the content of the robots.txt file can be updated automatically and the sitemap file can submit to search engines. It can craw the entered URL and create a sitemap file.
 
 Sitemap format: http://www.sitemaps.org/protocol.html
 
