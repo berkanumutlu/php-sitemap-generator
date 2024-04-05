@@ -153,13 +153,33 @@ if (!empty($_POST['sitemap_generator_url'])) {
         if (!empty($_POST['url_limit'])) {
             $sitemap_generator->setUrlLimit(trim($_POST['url_limit']));
         }
+        if (!empty($_POST['anchor_href_list'])) {
+            $list = explode(',', trim($_POST['anchor_href_list']));
+            $anchor_href_list = array_map('trim', $list);
+            $sitemap_generator->setIgnoreAnchorHrefList($anchor_href_list);
+        }
+        if (!empty($_POST['anchor_id_list'])) {
+            $list = explode(',', trim($_POST['anchor_id_list']));
+            $anchor_id_list = array_map('trim', $list);
+            $sitemap_generator->setIgnoreAnchorIdList($anchor_id_list);
+        }
+        if (!empty($_POST['anchor_name_list'])) {
+            $list = explode(',', trim($_POST['anchor_name_list']));
+            $anchor_name_list = array_map('trim', $list);
+            $sitemap_generator->setIgnoreAnchorNameList($anchor_name_list);
+        }
+        if (!empty($_POST['anchor_class_list'])) {
+            $list = explode(',', trim($_POST['anchor_class_list']));
+            $anchor_class_list = array_map('trim', $list);
+            $sitemap_generator->setIgnoreAnchorClassList($anchor_class_list);
+        }
         $domain_url = $sitemap_generator->getSitemap()->getDomain();
         $sitemap_generator->getSitemap()->setFilePath(BASE_PATH.'sitemap/');
         $site_url = str_replace(['http://', 'https://'], ['', ''], $domain_url);
         $sitemap_generator->getSitemap()->setFileName('sitemap-'.$site_url);
         $sitemap_generator->getSitemap()->setFileExt('.xml');
-        $scan_url = $sitemap_generator->scan_url($domain_url);
-        if ($scan_url->isStatus()) {
+        $response = $sitemap_generator->scan_url($domain_url);
+        if ($response->isStatus()) {
             $response = $sitemap_generator->generate();
         }
     } catch (\Exception $e) {

@@ -319,6 +319,43 @@ $sitemap_generator = new SitemapGenerator();
                                                    value="<?= $sitemap_generator->getUrlLimit() ?>">
                                         </div>
                                     </div>
+                                    <div class="col-12 col-md-4"></div>
+                                    <div class="col-12 col-md-4"></div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="mb-3">
+                                            <label for="anchor_href_list" class="form-label">Ignore anchor href
+                                                list</label>
+                                            <input type="text" id="anchor_href_list" name="anchor_href_list"
+                                                   class="form-control">
+                                            <small>(Separate with comma)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="mb-3">
+                                            <label for="anchor_id_list" class="form-label">Ignore anchor id list</label>
+                                            <input type="text" id="anchor_id_list" name="anchor_id_list"
+                                                   class="form-control">
+                                            <small>(Separate with comma)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="mb-3">
+                                            <label for="anchor_name_list" class="form-label">Ignore anchor name
+                                                list</label>
+                                            <input type="text" id="anchor_name_list" name="anchor_name_list"
+                                                   class="form-control">
+                                            <small>(Separate with comma)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="mb-3">
+                                            <label for="anchor_class_list" class="form-label">Ignore anchor class
+                                                list</label>
+                                            <input type="text" id="anchor_class_list" name="anchor_class_list"
+                                                   class="form-control">
+                                            <small>(Separate with comma)</small>
+                                        </div>
+                                    </div>
                                     <hr>
                                     <div class="col-12">
                                         <div class="d-flex justify-content-center">

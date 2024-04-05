@@ -115,7 +115,7 @@ jQuery(function ($) {
                     alertIcon.closest('.alert-success').hide();
                 }
             }
-            if (response.data.hasOwnProperty('file_url')) {
+            if (response.hasOwnProperty('data') && response.data !== null && response.data.hasOwnProperty('file_url')) {
                 submit_sitemap_button.attr('data-sitemap-url', response.data.file_url)
             }
         });
