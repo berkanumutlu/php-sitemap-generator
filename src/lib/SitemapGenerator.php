@@ -8,6 +8,7 @@ use DOMDocument;
  * @author     Berkan Ümütlü (github.com/berkanumutlu)
  * @copyright  © 2023 Berkan Ümütlü
  * @version    1.0.3
+ * @see        https://github.com/berkanumutlu/php-sitemap-generator
  */
 class SitemapGenerator
 {

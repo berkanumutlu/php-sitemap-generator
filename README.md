@@ -17,7 +17,16 @@ This project can be used to generate sitemaps. It can build a sitemap file from 
 
 Sitemap format: http://www.sitemaps.org/protocol.html
 
-## Sitemap file
+## Features
+
+- [x] Generate sitemap file from DB (ext-pdo)
+- [x] Generate gzip compression sitemap file (ext-zlib)
+- [x] Generate sitemap file from URL (ext-curl, ext-dom)
+- [x] Create or update robots.txt
+- [x] Submit sitemap file to search engines
+- [ ] Generate sitemap file with [The SimpleXMLElement](https://php.net/manual/en/class.simplexmlelement.php) class
+
+## After generating sitemap file
 
 ~~After creating your sitemap.xml file, you should add the XML file to your `robots.txt`.~~
 
@@ -25,9 +34,9 @@ Sitemap format: http://www.sitemaps.org/protocol.html
 
 ~~Sitemap: http://example.com/sitemap/sitemap.xml~~
 
-Now you can create or update your robots.txt automatically.
+Now, it can create or update your robots.txt automatically.
 
-## Outputs
+## Sitemap file
 
 - Example output when generating a sitemap
 
@@ -380,8 +389,12 @@ Now you can create or update your robots.txt automatically.
 
 ## Screenshots
 
-![screenshot01](screenshots/screenshot01.png)
-![screenshot02](screenshots/screenshot02.png)
+![screenshot01-generate-sitemap-from-db](screenshots/screenshot01.png)
+![screenshot02-generate-sitemap-from-db](screenshots/screenshot02.png)
+![screenshot03-generate-sitemap-from-db-submit-sitemap](screenshots/screenshot03.png)
+![screenshot04-generate-sitemap-from-url](screenshots/screenshot04.png)
+![screenshot05-generate-sitemap-from-url](screenshots/screenshot05.png)
+![screenshot06-generate-sitemap-from-url-submit-sitemap](screenshots/screenshot06.png)
 
 ## License
 
