@@ -1,11 +1,14 @@
 <?php namespace App\Library;
 
+use DOMDocument;
+
 /**
  * @category   class
  * @package    SitemapGenerator
  * @author     Berkan Ümütlü (github.com/berkanumutlu)
  * @copyright  © 2023 Berkan Ümütlü
- * @version    1.0.2
+ * @version    1.0.3
+ * @see        https://github.com/berkanumutlu/php-sitemap-generator
  */
 class SitemapGenerator
 {
@@ -110,6 +113,22 @@ class SitemapGenerator
      * @var bool
      */
     private $create_robots_txt = false;
+    /**
+     * @var array
+     */
+    private $ignore_anchor_id_list = array();
+    /**
+     * @var array
+     */
+    private $ignore_anchor_href_list = array();
+    /**
+     * @var array
+     */
+    private $ignore_anchor_name_list = array();
+    /**
+     * @var array
+     */
+    private $ignore_anchor_class_list = array();
 
     public function __construct()
     {
@@ -141,6 +160,7 @@ class SitemapGenerator
     {
         $this->url_list[] = $this->getUrl();
         $this->setUrl(array());
+        $this->setUrlImage(array());
     }
 
     /**
@@ -294,6 +314,70 @@ class SitemapGenerator
     }
 
     /**
+     * @return array
+     */
+    public function getIgnoreAnchorIdList()
+    {
+        return $this->ignore_anchor_id_list;
+    }
+
+    /**
+     * @param  array  $ignore_anchor_id_list
+     */
+    public function setIgnoreAnchorIdList($ignore_anchor_id_list)
+    {
+        $this->ignore_anchor_id_list = $ignore_anchor_id_list;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIgnoreAnchorHrefList()
+    {
+        return $this->ignore_anchor_href_list;
+    }
+
+    /**
+     * @param  array  $ignore_anchor_href_list
+     */
+    public function setIgnoreAnchorHrefList($ignore_anchor_href_list)
+    {
+        $this->ignore_anchor_href_list = $ignore_anchor_href_list;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIgnoreAnchorNameList()
+    {
+        return $this->ignore_anchor_name_list;
+    }
+
+    /**
+     * @param  array  $ignore_anchor_name_list
+     */
+    public function setIgnoreAnchorNameList($ignore_anchor_name_list)
+    {
+        $this->ignore_anchor_name_list = $ignore_anchor_name_list;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIgnoreAnchorClassList()
+    {
+        return $this->ignore_anchor_class_list;
+    }
+
+    /**
+     * @param  array  $ignore_anchor_class_list
+     */
+    public function setIgnoreAnchorClassList($ignore_anchor_class_list)
+    {
+        $this->ignore_anchor_class_list = $ignore_anchor_class_list;
+    }
+
+    /**
      * @return mixed|string
      */
     public function get_url_loc()
@@ -307,8 +391,8 @@ class SitemapGenerator
      */
     public function set_url_loc($url_loc)
     {
-        if (!strpos($url_loc, $this->getSitemap()->getDomain())) {
-            $url_loc = $this->getSitemap()->getDomain().'/'.$url_loc;
+        if (!empty($url_loc)) {
+            $url_loc = str_replace('&', '&amp;', $url_loc);
         }
         $this->url['loc'] = $url_loc;
     }
@@ -334,6 +418,22 @@ class SitemapGenerator
     }
 
     /**
+     * @return string
+     */
+    public function get_url_change_freq()
+    {
+        return isset($this->url['change_freq']) ? $this->url['change_freq'] : '';
+    }
+
+    /**
+     * @param  string  $change_freq
+     */
+    public function set_url_change_freq($change_freq)
+    {
+        $this->url['change_freq'] = $change_freq;
+    }
+
+    /**
      * @return mixed|string
      */
     public function get_url_priority()
@@ -356,9 +456,6 @@ class SitemapGenerator
      */
     public function set_url_image_loc($url_image_loc)
     {
-        if (!strpos($url_image_loc, $this->getSitemap()->getDomain())) {
-            $url_image_loc = $this->getSitemap()->getDomain().'/'.$url_image_loc;
-        }
         $this->url_image['loc'] = $url_image_loc;
     }
 
@@ -391,6 +488,9 @@ class SitemapGenerator
                 if (isset($item->lastmod)) {
                     $data .= '<lastmod>'.$item->lastmod.'</lastmod>';
                 }
+                if (isset($item->change_freq)) {
+                    $data .= '<changefreq>'.$item->change_freq.'</changefreq>';
+                }
                 if (isset($item->priority)) {
                     $data .= '<priority>'.$item->priority.'</priority>';
                 }
@@ -417,16 +517,22 @@ class SitemapGenerator
     public function create_file_path($path)
     {
         $this->response->setStatus(false);
-        $dir = is_file($path) ? pathinfo($path, PATHINFO_DIRNAME) : $path;
-        if (is_dir($dir)) {
-            $this->response->setStatus(true);
-        } else {
-            if (mkdir($dir)) {
-                chmod($dir, 0777);
+        try {
+            $dir = is_file($path) ? pathinfo($path, PATHINFO_DIRNAME) : $path;
+            if (is_dir($dir)) {
                 $this->response->setStatus(true);
             } else {
-                $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>, Dir path: <strong>'.$dir.'</strong>');
+                if (mkdir($dir)) {
+                    chmod($dir, 0777);
+                    $this->response->setStatus(true);
+                } else {
+                    $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>, Dir path: <strong>'.$dir.'</strong>');
+                }
             }
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusText($e->getMessage());
+            $this->response->setMessage('The directory could not be created.<br>Date: <strong>'.$this->response->getDate().'</strong>, Dir path: <strong>'.$dir.'</strong>');
         }
         return $this->response;
     }
@@ -458,9 +564,6 @@ class SitemapGenerator
                     $sitemap_index_content .= '<sitemap>
                             <loc>'.$sitemap_file_url.$sitemap_file.'</loc>
                             <lastmod>'.date('Y-m-d', filectime($index_path.$sitemap_file)).'</lastmod>';
-                    if ($this->getPriority()) {
-                        $sitemap_index_content .= '<priority>'.$this->getPriority().'</priority>';
-                    }
                     $sitemap_index_content .= '</sitemap>';
                 }
             }
@@ -485,20 +588,30 @@ class SitemapGenerator
         $create_file_path = $this->create_file_path($file_path);
         $sitemap_file_path = $file_path.$file_name.$file_ext;
         if ($create_file_path->isStatus()) {
-            $result = file_put_contents($sitemap_file_path, $file_data);
             $date = $this->response->getDate();
-            if (!empty($result)) {
-                $this->response->setStatus(true);
-                $sitemap_file_path_info = pathinfo($sitemap_file_path);
-                $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                        $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
-                if ($this->isCreateGzipFile()) {
-                    $sitemap_file_url .= '.gz';
+            try {
+                $result = file_put_contents($sitemap_file_path, $file_data);
+                if (!empty($result)) {
+                    $this->response->setStatus(true);
+                    $sitemap_file_path_info = pathinfo($sitemap_file_path);
+                    $sitemap_file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                            $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
+                    $sitemap_file_base_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                            $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
+                    if ($this->isCreateGzipFile()) {
+                        $sitemap_file_url .= '.gz';
+                        $sitemap_file_base_url .= '.gz';
+                    }
+                    $sitemap_file_url .= '?v='.urlencode($date);
+                    $sitemap_file_base_url .= '?v='.urlencode($date);
+                    $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$date.'</strong>, File path: <a href="'.$sitemap_file_base_url.'" target="_blank"><strong>'.$sitemap_file_path.'</strong></a>');
+                    $this->response->setData(['file_url' => $sitemap_file_url]);
+                } else {
+                    $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$date.'</strong>, File path: <strong>'.$sitemap_file_path.'</strong>');
                 }
-                $sitemap_file_url .= '?v='.urlencode($date);
-                $this->response->setMessage('Sitemap file created successfully.<br>Date: <strong>'.$date.'</strong>, File path: <a href="'.$sitemap_file_url.'" target="_blank"><strong>'.$sitemap_file_path.'</strong></a>');
-                $this->response->setData(['file_url' => $sitemap_file_url]);
-            } else {
+            } catch (\Exception $e) {
+                $this->response->setStatusCode($e->getCode());
+                $this->response->setStatusText($e->getMessage());
                 $this->response->setMessage('Sitemap file could not write.<br>Date: <strong>'.$date.'</strong>, File path: <strong>'.$sitemap_file_path.'</strong>');
             }
         } else {
@@ -516,17 +629,23 @@ class SitemapGenerator
      */
     public function write_gzip_file($file_name, $file_path, $file_ext, $file_data)
     {
-        $gzip_file_path = $file_path.$file_name.$file_ext.'.gz';
-        $gzip = gzopen($gzip_file_path, 'w');
-        gzwrite($gzip, $file_data);
-        $result = gzclose($gzip);
         $date = $this->response->getDate();
-        if ($result) {
-            $gzip_file_path_info = pathinfo($gzip_file_path);
-            $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                    $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
-            $message = 'Sitemap gzip file created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
-        } else {
+        $gzip_file_path = $file_path.$file_name.$file_ext.'.gz';
+        try {
+            $gzip = gzopen($gzip_file_path, 'w');
+            gzwrite($gzip, $file_data);
+            $result = gzclose($gzip);
+            if ($result) {
+                $gzip_file_path_info = pathinfo($gzip_file_path);
+                $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
+                $message = 'Sitemap gzip file created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
+            } else {
+                $message = 'Sitemap gzip file could not write.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <strong>'.$gzip_file_path.'</strong>';
+            }
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusText($e->getMessage());
             $message = 'Sitemap gzip file could not write.<br>Date: <strong>'.$date.'</strong>, Gzip File path: <strong>'.$gzip_file_path.'</strong>';
         }
         $response_message = $this->response->getMessage();
@@ -541,44 +660,51 @@ class SitemapGenerator
      */
     public function write_gzip_files($file_name, $folder_path, $file_ext)
     {
+        $date = $this->response->getDate();
         $gzip_file_path = $folder_path.$file_name.$file_ext.'.gz';
-        $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $sitemap_index_footer = '</sitemapindex>';
-        $gzip_file_content = '';
-        $gzip = gzopen($gzip_file_path, 'w9');
-        $files = scandir($folder_path);
-        foreach ($files as $file) {
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
-            $folder_file_path = $folder_path.$file;
-            if (is_dir($folder_file_path)) {
-                $folder_files = scandir($folder_file_path);
-                foreach ($folder_files as $folder_file) {
-                    if ($folder_file === '.' || $folder_file === '..') {
-                        continue;
-                    }
-                    $folder_file_path_info = pathinfo($folder_file);
-                    if ($folder_file_path_info['extension'] == 'gz') {
-                        $file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                                $folder_file_path).'/'.$folder_file;
-                        $gzip_file_content .= '<sitemap>
+        try {
+            $sitemap_index_header = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!--Created with PHP Sitemap Generator by Berkan Ümütlü (https://github.com/berkanumutlu/php-sitemap-generator)-->';
+            $sitemap_index_footer = '</sitemapindex>';
+            $gzip_file_content = '';
+            $gzip = gzopen($gzip_file_path, 'w9');
+            $files = scandir($folder_path);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+                $folder_file_path = $folder_path.$file;
+                if (is_dir($folder_file_path)) {
+                    $folder_files = scandir($folder_file_path);
+                    foreach ($folder_files as $folder_file) {
+                        if ($folder_file === '.' || $folder_file === '..') {
+                            continue;
+                        }
+                        $folder_file_path_info = pathinfo($folder_file);
+                        if ($folder_file_path_info['extension'] == 'gz') {
+                            $file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                                    $folder_file_path).'/'.$folder_file;
+                            $gzip_file_content .= '<sitemap>
                                 <loc>'.$file_url.'</loc>
                                 <lastmod>'.date('Y-m-d', filectime($folder_file_path.'/'.$folder_file)).'</lastmod>
                         </sitemap>';
+                        }
                     }
                 }
             }
-        }
-        gzwrite($gzip, $sitemap_index_header.$gzip_file_content.$sitemap_index_footer);
-        $result = gzclose($gzip);
-        $date = $this->response->getDate();
-        if ($result) {
-            $gzip_file_path_info = pathinfo($gzip_file_path);
-            $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                    $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
-            $message = 'Sitemap gzip files created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
-        } else {
+            gzwrite($gzip, $sitemap_index_header.$gzip_file_content.$sitemap_index_footer);
+            $result = gzclose($gzip);
+            if ($result) {
+                $gzip_file_path_info = pathinfo($gzip_file_path);
+                $gzip_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $gzip_file_path_info['dirname']).'/'.$gzip_file_path_info['basename'].'?v='.urlencode($date);
+                $message = 'Sitemap gzip files created successfully.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <a href="'.$gzip_file_url.'" target="_blank"><strong>'.$gzip_file_path.'</strong></a>';
+            } else {
+                $message = 'Sitemap gzip files could not write.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <strong>'.$gzip_file_path.'</strong>';
+            }
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusText($e->getMessage());
             $message = 'Sitemap gzip files could not write.<br>Date: <strong>'.$date.'</strong>, Gzip Files path: <strong>'.$gzip_file_path.'</strong>';
         }
         $response_message = $this->response->getMessage();
@@ -659,22 +785,28 @@ class SitemapGenerator
             $response_list = array();
             $site_url = str_replace(['http://', 'https://'], ['', ''], $this->getSitemap()->getDomain());
             $sitemap_url = urlencode($sitemap_url);
-            foreach ($search_engine_list as $search_engine_url) {
-                $search_engine_url = str_replace('{site_url}', $site_url, $search_engine_url);
-                $search_engine_url = str_replace('{sitemap_url}', $sitemap_url, $search_engine_url);
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $search_engine_url.$sitemap_url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                $response = curl_exec($ch);
-                curl_close($ch);
-                $response_list[] = [
-                    'url'      => $search_engine_url,
-                    'response' => $response
-                ];
+            try {
+                foreach ($search_engine_list as $search_engine_url) {
+                    $search_engine_url = str_replace('{site_url}', $site_url, $search_engine_url);
+                    $search_engine_url = str_replace('{sitemap_url}', $sitemap_url, $search_engine_url);
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $search_engine_url.$sitemap_url);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+                    $response_list[] = [
+                        'url'      => $search_engine_url,
+                        'response' => $response
+                    ];
+                }
+                $this->response->setStatus(true);
+                $this->response->setMessage('Submitting sitemap completed.');
+                $this->response->setData($response_list);
+            } catch (\Exception $e) {
+                $this->response->setStatusCode($e->getCode());
+                $this->response->setStatusText($e->getMessage());
+                $this->response->setMessage('An error occurred while submitting the sitemap.');
             }
-            $this->response->setStatus(true);
-            $this->response->setMessage('Submitting sitemap completed.');
-            $this->response->setData($response_list);
         } else {
             $this->response->setMessage('Search engine list empty.');
         }
@@ -716,7 +848,7 @@ class SitemapGenerator
          */
         $sitemap_file_path = $file_path.$file_name.$file_ext;
         $sitemap_file_path_info = pathinfo($sitemap_file_path);
-        $sitemap_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+        $sitemap_file_url = $this->getSitemap()->getDomain().str_replace($_SERVER["DOCUMENT_ROOT"], '',
                 $sitemap_file_path_info['dirname']).'/'.$sitemap_file_path_info['basename'];
         if ($this->isCreateGzipFile()) {
             $sitemap_file_url .= '.gz';
@@ -730,16 +862,137 @@ class SitemapGenerator
         /*
          * Writing robots.txt file contents
          */
-        $result = file_put_contents($robots_txt_file, $robots_txt_file_content);
-        if (!empty($result)) {
-            $robots_txt_file_path_info = pathinfo($robots_txt_file);
-            $robots_txt_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
-                    $robots_txt_file_path_info['dirname']).'/'.$robots_txt_file_path_info['basename'].'?v='.urlencode($date);
-            $message = 'robots.txt file updated successfully.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <a href="'.$robots_txt_file_url.'" target="_blank"><strong>'.$robots_txt_file.'</strong></a>';
-        } else {
+        try {
+            $result = file_put_contents($robots_txt_file, $robots_txt_file_content);
+            if (!empty($result)) {
+                $robots_txt_file_path_info = pathinfo($robots_txt_file);
+                $robots_txt_file_url = $this->base_url.str_replace($_SERVER["DOCUMENT_ROOT"], '',
+                        $robots_txt_file_path_info['dirname']).'/'.$robots_txt_file_path_info['basename'].'?v='.urlencode($date);
+                $message = 'robots.txt file updated successfully.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <a href="'.$robots_txt_file_url.'" target="_blank"><strong>'.$robots_txt_file.'</strong></a>';
+            } else {
+                $message = 'robots.txt file could not write.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <strong>'.$robots_txt_file.'</strong>';
+            }
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusText($e->getMessage());
             $message = 'robots.txt file could not write.<br>Date: <strong>'.$date.'</strong>, robots.txt file path: <strong>'.$robots_txt_file.'</strong>';
         }
         $response_message = $this->response->getMessage();
         $this->response->setMessage($response_message.'<br><br>'.$message);
+    }
+
+    /**
+     * @param $url
+     * @return Response
+     */
+    private function get_html_from_url($url)
+    {
+        $this->response->setStatus(false);
+        if (!extension_loaded('curl')) {
+            $this->response->setMessage('cURL library is not loaded.');
+            return $this->response;
+        }
+        if (!extension_loaded('dom')) {
+            $this->response->setMessage('dom library is not loaded.');
+            return $this->response;
+        }
+        try {
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $html = curl_exec($curl);
+            curl_close($curl);
+            if (!empty($html)) {
+                $dom = new DOMDocument();
+                $dom->loadHTML($html);
+                $this->response->setData(['html' => $dom]);
+                $this->response->setStatus(true);
+                $this->response->setStatusCode(200);
+            } else {
+                $this->response->setMessage($url.' response is empty.');
+            }
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusText($e->getMessage());
+            $this->response->setMessage('An error occurred while crawling the url.');
+        }
+        return $this->response;
+    }
+
+    /**
+     * @param $page_url
+     * @return Response|void
+     */
+    public function scan_url($page_url)
+    {
+        $this->response->setStatus(false);
+        $url = filter_var($page_url, FILTER_SANITIZE_URL);
+        $url_list = $this->getUrllist();
+        if (in_array($url, $url_list) || !filter_var($page_url, FILTER_VALIDATE_URL)) {
+            return;
+        }
+        $url_last_mod = $this->getLastMod();
+        $url_change_freq = $this->getChangeFreq();
+        $url_priority = $this->getPriority();
+        $this->set_url_loc($page_url);
+        $this->set_url_last_mod($url_last_mod);
+        $this->set_url_change_freq($url_change_freq);
+        $this->set_url_priority($url_priority);
+        $this->add_url_to_list();
+        $this->response = $this->get_html_from_url($url);
+        if ($this->response->isStatus()) {
+            try {
+                $ignore_anchor_href_list = $this->getIgnoreAnchorHrefList();
+                $ignore_anchor_id_list = $this->getIgnoreAnchorIdList();
+                $ignore_anchor_name_list = $this->getIgnoreAnchorNameList();
+                $ignore_anchor_class_list = $this->getIgnoreAnchorClassList();
+                $html = $this->response->getData()['html'];
+                $anchors = $html->getElementsByTagName('a');
+                foreach ($anchors as $a) {
+                    $href = $a->getAttribute('href');
+                    if (empty($href)) {
+                        continue;
+                    }
+                    if (in_array($href, $ignore_anchor_href_list)) {
+                        continue;
+                    }
+                    if (!filter_var($href, FILTER_VALIDATE_URL)) {
+                        if (!filter_var($page_url.$href, FILTER_VALIDATE_URL)) {
+                            continue;
+                        } else {
+                            $href = $page_url.$href;
+                        }
+                    }
+                    $rel = $a->getAttribute('rel');
+                    if (!empty($rel) && strpos($rel, 'nofollow') !== false) {
+                        continue;
+                    }
+                    $id = $a->getAttribute('id');
+                    if (in_array($id, $ignore_anchor_id_list)) {
+                        continue;
+                    }
+                    $class = $a->getAttribute('class');
+                    if (in_array($class, $ignore_anchor_class_list)) {
+                        continue;
+                    }
+                    $name = $a->getAttribute('name');
+                    if (in_array($name, $ignore_anchor_name_list)) {
+                        continue;
+                    }
+                    $this->set_url_loc($href);
+                    $this->set_url_last_mod($url_last_mod);
+                    $this->set_url_change_freq($url_change_freq);
+                    $this->set_url_priority($url_priority);
+                    $this->add_url_to_list();
+                }
+                $this->response->setStatus(true);
+            } catch (\Exception $e) {
+                $this->response->setStatus(false);
+                $this->response->setStatusCode($e->getCode());
+                $this->response->setStatusText($e->getMessage());
+                $this->response->setMessage('An error occurred while crawling the url.');
+            }
+        }
+        return $this->response;
     }
 }

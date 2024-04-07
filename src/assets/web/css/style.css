@@ -20,6 +20,10 @@ a:hover {
     color: var(--color-primary-hover);
 }
 
+small {
+    font-size: 12px;
+}
+
 .btn-primary {
     --bs-btn-color: var(--color-text-secondary);
     --bs-btn-bg: var(--color-primary);

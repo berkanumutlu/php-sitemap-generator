@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: http://localhost/sitemap/sitemap.xml?v=2024-03-30+15%3A51%3A40
+Sitemap: http://example.com/sitemap/sitemap.xml.gz?v=2024-04-02+16%3A16%3A03
